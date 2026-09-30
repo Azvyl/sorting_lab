@@ -1,139 +1,65 @@
 /* =========================================================
-   BLUE ARCHIVE THEME DEFINITIONS
-   Arona Theme (Light) & Plana Theme (Dark)
+   SCI-FI FUTURISTIC HUD THEME DEFINITIONS
    ========================================================= */
-
 :root {
   box-sizing: border-box;
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
-  --sans: 'Inter', system-ui, sans-serif;
+
+  --sans: 'Inter', system-ui, -apple-system, sans-serif;
   --serif: 'Source Serif 4', Georgia, serif;
-  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+  /* HUD Cyber Colors */
+  --bg: #030813;
+  --bg2: #061024;
+  --panel: rgba(8, 22, 45, 0.65);
+  --panel-2: rgba(15, 38, 75, 0.5);
+  --border: rgba(0, 210, 255, 0.35);
+  --border-glow: rgba(0, 210, 255, 0.6);
+
+  --text: #e0f7ff;
+  --muted: #6b9abb;
+  --accent: #00f0ff;
+  --accent-soft: rgba(0, 240, 255, 0.15);
+  --accent-text: #020c1b;
+
+  /* HUD Visualizer States */
+  --amber: #ffaa00;
+  /* Compare / Warning */
+  --coral: #ff0055;
+  /* Swap / Active Alert */
+  --sage: #00ffaa;
+  /* Sorted / Success */
+  --violet: #d000ff;
+  /* Pivot / Special */
+
+  /* Structural Specifics */
+  --paper: rgba(6, 16, 36, 0.7);
+  --paper-2: rgba(12, 28, 58, 0.6);
+  --paper-line: rgba(0, 210, 255, 0.2);
+  --ink: #e0f7ff;
+  --red: #ff0055;
+  --red-soft: rgba(ff, 0, 85, 0.2);
+  --blue: #00f0ff;
+  --blue-soft: rgba(0, 240, 255, 0.2);
+  --gold: #ffaa00;
+  --gold-soft: rgba(255, 170, 0, 0.2);
+  --ok: #00ffaa;
+  --ok-soft: rgba(0, 255, 170, 0.2);
 }
 
-/* ---------------------------------------------------------
-   ARONA THEME (LIGHT MODE)
-   Schale / Arona Sky Blue & Halo Pink
-   --------------------------------------------------------- */
-:root,
-:root[data-theme="light"] {
-  /* Common Shell / Lab Colors */
-  --bg: #F0F4F9;
-  --bg2: #FFFFFF;
-  --panel: #FFFFFF;
-  --panel-2: #E8EEF5;
-  --border: #D0DCEB;
-  --text: #1C2836;
-  --muted: #62778E;
-  --accent: #2B82C9;
-  /* Halo Blue Arona */
-  --accent-soft: #2B82C91A;
-  --accent-text: #FFFFFF;
-
-  /* Visualizer State Colors */
-  --amber: #D9822B;
-  /* Warning / Active */
-  --coral: #E05275;
-  /* Arona Halo Pink (Swap/Error) */
-  --sage: #28A745;
-  /* Success / Sorted */
-  --violet: #8A54A2;
-  /* Pivot */
-
-  /* SIK Specific Paper/Cover Theme */
-  --cover: #1B4965;
-  --cover-2: #0B2545;
-  --cover-text: #EEF4F8;
-  --cover-text-dim: #90B4CE;
-  --paper: #FFFFFF;
-  --paper-2: #F4F7FA;
-  --paper-line: #E1E8F0;
-  --ink: #1C2836;
-  --red: #E05275;
-  --red-soft: #E052751C;
-  --blue: #2B82C9;
-  --blue-soft: #2B82C91C;
-  --gold: #D9822B;
-  --gold-soft: #D9822B22;
-  --ok: #28A745;
-  --ok-soft: #28A74520;
-}
-
-/* ---------------------------------------------------------
-   PLANA THEME (DARK MODE)
-   Plana Deep Midnight, Ice Blue & Crimson Pink
-   --------------------------------------------------------- */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0B0E14;
-    --bg2: #121721;
-    --panel: #141A24;
-    --panel-2: #1C2432;
-    --border: #283344;
-    --text: #E6EDF5;
-    --muted: #7E90A6;
-    --accent: #4FA8E8;
-    /* Cold / Ice Blue Plana */
-    --accent-soft: #4FA8E822;
-    --accent-text: #0B0E14;
-
-    --amber: #E29578;
-    --coral: #FF4D6D;
-    /* Plana Crimson Pink */
-    --sage: #4EBA6F;
-    --violet: #B583E6;
-
-    --cover: #080A0E;
-    --cover-2: #030406;
-    --cover-text: #E6EDF5;
-    --cover-text-dim: #7E90A6;
-    --paper: #0B0E14;
-    --paper-2: #141A24;
-    --paper-line: #212B3B;
-    --ink: #E6EDF5;
-    --red: #FF4D6D;
-    --red-soft: #FF4D6D22;
-    --blue: #4FA8E8;
-    --blue-soft: #4FA8E822;
-    --gold: #E29578;
-    --gold-soft: #E2957826;
-    --ok: #4EBA6F;
-    --ok-soft: #4EBA6F22;
-  }
-}
-
+:root[data-theme="light"],
 :root[data-theme="dark"] {
-  --bg: #0B0E14;
-  --bg2: #121721;
-  --panel: #141A24;
-  --panel-2: #1C2432;
-  --border: #283344;
-  --text: #E6EDF5;
-  --muted: #7E90A6;
-  --accent: #4FA8E8;
-  --accent-soft: #4FA8E822;
-  --accent-text: #0B0E14;
-
-  --amber: #E29578;
-  --coral: #FF4D6D;
-  --sage: #4EBA6F;
-  --violet: #B583E6;
-
-  --cover: #080A0E;
-  --cover-2: #030406;
-  --cover-text: #E6EDF5;
-  --cover-text-dim: #7E90A6;
-  --paper: #0B0E14;
-  --paper-2: #141A24;
-  --paper-line: #212B3B;
-  --ink: #E6EDF5;
-  --red: #FF4D6D;
-  --red-soft: #FF4D6D22;
-  --blue: #4FA8E8;
-  --blue-soft: #4FA8E822;
-  --gold: #E29578;
-  --gold-soft: #E2957826;
-  --ok: #4EBA6F;
-  --ok-soft: #4EBA6F22;
+  /* Memaksa selalu dalam mode Dark Sci-Fi HUD Cybernetic */
+  --bg: #030813;
+  --bg2: #061024;
+  --panel: rgba(8, 22, 45, 0.65);
+  --panel-2: rgba(15, 38, 75, 0.5);
+  --border: rgba(0, 210, 255, 0.35);
+  --text: #e0f7ff;
+  --muted: #6b9abb;
+  --accent: #00f0ff;
+  --accent-soft: rgba(0, 240, 255, 0.15);
+  --accent-text: #020c1b;
 }

@@ -4,11 +4,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Materi Sorting &amp; Studi Kasus Sorting</title>
+  <title>Terminal Algoritma Sorting</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="css/themes.css">
   <link rel="stylesheet" href="css/shell.css">
@@ -17,31 +17,30 @@
 <body>
   <header class="shell-top">
     <div class="title">
-      <h1>Materi Sorting &amp; Studi Kasus Sorting</h1>
-      <p>Satu tema, dua ruang belajar algoritma pengurutan</p>
+      <h1><span style="color:var(--accent)">⬢</span> SORTING_LAB // TERMINAL v2.0</h1>
+      <p>SYS.MATRIX // VISUALISASI ALGORITMA PENGURUTAN DATA</p>
     </div>
     <div class="tabs" role="tablist">
       <button type="button" class="active" data-target="pane-lab" role="tab" aria-selected="true">
-        <span class="dot"></span><span class="label-long">1 &middot; </span>Materi Sorting
+        <span class="dot"></span><span class="label-long">01 &middot; </span>MATERI SORTING
       </button>
       <button type="button" data-target="pane-sik" role="tab" aria-selected="false">
-        <span class="dot"></span><span class="label-long">2 &middot; </span>Studi Kasus Sorting
+        <span class="dot"></span><span class="label-long">02 &middot; </span>STUDI KASUS SORTING
       </button>
     </div>
-    <button class="theme-btn" id="shellTheme" title="Ganti tema" aria-label="Ganti tema">🌙</button>
   </header>
   <main class="shell-body">
     <div class="frame-wrap active" id="pane-lab">
       <div class="loading" id="loading-lab">
-        <div class="spin"></div>Memuat Materi Sorting...
+        <div class="spin"></div>INITIALIZING DATA MATRIX...
       </div>
-      <iframe id="frame-lab" src="lab.html" title="Materi Sorting - Data Structure"></iframe>
+      <iframe id="frame-lab" src="lab.html" title="Materi Sorting"></iframe>
     </div>
     <div class="frame-wrap" id="pane-sik">
       <div class="loading" id="loading-sik">
-        <div class="spin"></div>Memuat Studi Kasus Sorting...
+        <div class="spin"></div>LOADING CLASS DATA TERMINAL...
       </div>
-      <iframe id="frame-sik" src="sik.html" title="Studi Kasus Sorting - Sistem Informasi Kelas"></iframe>
+      <iframe id="frame-sik" src="sik.html" title="Studi Kasus Sorting"></iframe>
     </div>
   </main>
   <script src="js/shell.js"></script>

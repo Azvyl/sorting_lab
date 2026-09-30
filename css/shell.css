@@ -2,9 +2,6 @@ html {
   height: 100%;
   scroll-padding-top: env(safe-area-inset-top, 0px);
   -webkit-text-size-adjust: 100%;
-}
-
-* {
   box-sizing: border-box;
 }
 
@@ -12,11 +9,17 @@ body {
   margin: 0;
   height: 100%;
   background: var(--bg);
+  background-image:
+    radial-gradient(circle at 50% 30%, rgba(0, 240, 255, 0.08) 0%, transparent 70%),
+    linear-gradient(rgba(0, 210, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 210, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 30px 30px, 30px 30px;
   color: var(--text);
   font-family: var(--sans);
   -webkit-font-smoothing: antialiased;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 header.shell-top {
@@ -24,105 +27,111 @@ header.shell-top {
   align-items: center;
   gap: 14px;
   flex-wrap: wrap;
-  padding: 14px 18px;
-  padding-top: calc(14px + env(safe-area-inset-top, 0px));
+  padding: 12px 24px;
+  padding-top: calc(12px + env(safe-area-inset-top, 0px));
   border-bottom: 1px solid var(--border);
-  background: var(--bg2);
+  background: rgba(4, 12, 28, 0.85);
+  backdrop-filter: blur(12px);
   flex: none;
+  box-shadow: 0 4px 20px rgba(0, 240, 255, 0.15);
+  position: relative;
+  z-index: 10;
+}
+
+/* Pola Garis Sirkuit Header */
+header.shell-top::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
 }
 
 header.shell-top .title {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
   margin-right: auto;
   min-width: 0;
 }
 
 header.shell-top .title h1 {
   margin: 0;
-  font-family: var(--serif);
+  font-family: var(--mono);
   font-size: 18px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 0 10px var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 header.shell-top .title p {
   margin: 0;
-  font-size: 11.5px;
+  font-size: 11px;
+  font-family: var(--mono);
   color: var(--muted);
+  letter-spacing: 0.02em;
 }
 
+/* Tabs Berbentuk Trapesium / Cut Corner */
 .tabs {
   display: flex;
-  gap: 6px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  padding: 3px;
+  gap: 8px;
+  background: transparent;
+  padding: 0;
   flex: none;
 }
 
 .tabs button {
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--muted);
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 14px;
+  background: rgba(10, 30, 60, 0.6);
+  border: 1px solid var(--border);
+  padding: 8px 18px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 7px;
-  transition: background .15s ease, color .15s ease;
-  white-space: nowrap;
+  gap: 8px;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  transition: all 0.2s ease;
 }
 
 .tabs button:hover {
-  color: var(--text);
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 10px var(--accent-soft);
 }
 
 .tabs button.active {
   background: var(--accent);
   color: var(--accent-text);
+  border-color: var(--accent);
+  box-shadow: 0 0 15px var(--accent);
+  font-weight: 700;
 }
 
 .tabs button .dot {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
   background: currentColor;
-  opacity: .55;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
   flex: none;
 }
 
 .theme-btn {
-  flex: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text);
-  font-size: 15px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background .15s ease, transform .1s ease;
-}
-
-.theme-btn:hover {
-  background: var(--border);
-}
-
-.theme-btn:active {
-  transform: scale(.92);
+  display: none;
+  /* Disembunyikan karena Sci-Fi HUD fokus pada Dark Mode */
 }
 
 main.shell-body {
@@ -137,7 +146,7 @@ main.shell-body {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: opacity .15s ease;
+  transition: opacity 0.2s ease;
 }
 
 .frame-wrap.active {
@@ -151,7 +160,7 @@ main.shell-body {
   height: 100%;
   border: none;
   display: block;
-  background: var(--bg2);
+  background: transparent;
 }
 
 .loading {
@@ -161,41 +170,26 @@ main.shell-body {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: 10px;
-  color: var(--muted);
+  gap: 12px;
+  color: var(--accent);
+  font-family: var(--mono);
   font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .loading .spin {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 2.5px solid var(--border);
+  width: 32px;
+  height: 32px;
+  border: 2px solid transparent;
   border-top-color: var(--accent);
-  animation: spin .8s linear infinite;
+  border-bottom-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
   to {
     transform: rotate(360deg);
-  }
-}
-
-@media (max-width:640px) {
-  header.shell-top {
-    padding: 12px;
-  }
-
-  header.shell-top .title h1 {
-    font-size: 15px;
-  }
-
-  .tabs button {
-    padding: 7px 10px;
-    font-size: 12.3px;
-  }
-
-  .tabs button span.label-long {
-    display: none;
   }
 }

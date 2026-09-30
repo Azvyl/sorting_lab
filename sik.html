@@ -4,11 +4,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Studi Kasus Sorting • Sistem Informasi Kelas</title>
+  <title>Studi Kasus Sorting</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="css/themes.css">
   <link rel="stylesheet" href="css/sik.css">
@@ -19,247 +19,81 @@
     <aside class="cover">
       <div class="brand">
         <div class="mark">SK</div>
-        <button class="theme-btn" id="themeToggle" title="Ganti tema" aria-label="Ganti tema">🌙</button>
       </div>
       <div>
-        <h1>Studi Kasus Sorting<br><span
-            style="font-size:13px;font-weight:500;color:var(--cover-text-dim);font-family:var(--sans);">Sistem Informasi
-            Kelas</span></h1>
-        <div class="kelas-meta">RPL&#8209;3B &middot; Semester Ganjil 2026&#47;2027<br>Wali kelas: Pak Akbar</div>
+        <h1>STUDI KASUS // SIK</h1>
+        <div class="kelas-meta">RPL-3B &middot; Semester Ganjil<br>Wali kelas: Pak Akbar</div>
       </div>
       <nav>
-        <button data-view="data" class="active"><span class="tick">01</span> Data Mahasiswa</button>
-        <button data-view="sort"><span class="tick">02</span> Visualisasi Urutan</button>
-        <button data-view="compare"><span class="tick">03</span> Bandingkan Algoritma</button>
+        <button data-view="data" class="active"><span class="tick">01</span> DATA MAHASISWA</button>
+        <button data-view="sort"><span class="tick">02</span> VISUALISASI URUTAN</button>
+        <button data-view="compare"><span class="tick">03</span> BANDINGKAN ALGORITMA</button>
       </nav>
-      <div class="spacer"></div>
-      <div class="footnote">Data tersimpan di perangkat ini saja.<br>Tidak dibagikan ke siapa pun.</div>
     </aside>
     <main class="paper">
-      <!-- ===== VIEW 1: DATA MAHASISWA ===== -->
+      <!-- VIEW 1: DATA MAHASISWA -->
       <section class="view active" id="view-data">
         <div class="view-head">
-          <h2>Data Mahasiswa</h2>
-          <p>Kelola daftar mahasiswa satu kelas: tambah, hapus, dan lihat nilai. Data ini yang akan diurutkan pada tahap
-            visualisasi.</p>
+          <h2>DATABASE MAHASISWA</h2>
+          <p>Kelola entri data nilai dan identitas mahasiswa dalam lokal terminal.</p>
         </div>
         <form class="card add-form" id="addForm">
-          <div class="field nim"><label for="inNim">NIM</label><input id="inNim" type="text" inputmode="numeric"
-              placeholder="2401xxxx" maxlength="12"></div>
-          <div class="field nama"><label for="inNama">Nama lengkap</label><input id="inNama" type="text"
-              placeholder="Nama mahasiswa" maxlength="40"></div>
-          <div class="field nilai"><label for="inNilai">Nilai</label><input id="inNilai" type="number" min="0" max="100"
-              placeholder="0 – 100"></div>
-          <button type="submit" class="btn primary">+ Tambah</button>
+          <div class="field nim"><label for="inNim">NIM</label><input id="inNim" type="text" placeholder="2401xxxx">
+          </div>
+          <div class="field nama"><label for="inNama">NAMA</label><input id="inNama" type="text"
+              placeholder="Nama Mahasiswa"></div>
+          <div class="field nilai"><label for="inNilai">NILAI</label><input id="inNilai" type="number" min="0" max="100"
+              placeholder="0-100"></div>
+          <button type="submit" class="btn primary">+ TAMBAH DATA</button>
           <div class="form-error" id="formError"></div>
         </form>
         <div class="card table-wrap">
           <table class="roster">
             <thead>
               <tr>
-                <th>No</th>
+                <th>NO</th>
                 <th>NIM</th>
-                <th>Nama</th>
-                <th>Nilai</th>
-                <th></th>
+                <th>NAMA</th>
+                <th>NILAI</th>
+                <th>ACTION</th>
               </tr>
             </thead>
             <tbody id="rosterBody"></tbody>
           </table>
-          <div class="roster-foot">
-            <span id="rosterCount">0 mahasiswa</span>
-            <span id="appliedTagWrap"></span>
-          </div>
         </div>
       </section>
-      <!-- ===== VIEW 2: VISUALISASI URUTAN ===== -->
+      <!-- VIEW 2: VISUALISASI URUTAN -->
       <section class="view" id="view-sort">
         <div class="view-head">
-          <h2>Visualisasi Pengurutan</h2>
-          <p>Bubble Sort dan Insertion Sort dijalankan berdampingan pada data yang sama, sehingga terlihat jelas
-            perbedaan cara kerja dan jumlah langkahnya. Yang lebih cepat selesai akan ditandai di akhir.</p>
+          <h2>VISUALISASI EKSEKUSI DATA</h2>
+          <p>Pemrosesan Bubble Sort vs Insertion Sort secara simultan pada memori lokal.</p>
         </div>
         <div class="card sort-controls">
-          <div class="field"><label for="selKey">Urutkan berdasarkan</label>
+          <div class="field"><label for="selKey">KUNCI URUTAN</label>
             <select id="selKey">
-              <option value="nilai">Nilai</option>
-              <option value="nama">Nama</option>
+              <option value="nilai">NILAI</option>
+              <option value="nama">NAMA</option>
               <option value="nim">NIM</option>
             </select>
           </div>
-          <div class="field"><label for="selOrder">Arah</label>
+          <div class="field"><label for="selOrder">ARAH</label>
             <select id="selOrder">
-              <option value="asc">Naik (kecil → besar)</option>
-              <option value="desc">Turun (besar → kecil)</option>
+              <option value="asc">ASCENDING (NAIK)</option>
+              <option value="desc">DESCENDING (TURUN)</option>
             </select>
           </div>
-          <button class="btn primary" id="btnRun">▶ Jalankan Visualisasi</button>
-          <span class="stat-chip" id="chipStatus">Belum dijalankan</span>
+          <button class="btn primary" id="btnRun">▶ JALANKAN EKSEKUSI</button>
         </div>
         <div class="race-grid">
           <div class="card race-col" id="colBubble">
-            <div class="race-head">
-              <h3>Bubble Sort</h3><span class="win-crown" id="crownBubble">🏆</span><span class="fin-badge"
-                id="finBubble">selesai</span>
-            </div>
-            <div class="panel-title">Pseudokode</div>
-            <div class="code-scroll">
-              <div class="code" id="codeBoxBubble"></div>
-            </div>
-            <div class="stat-row">
-              <span class="stat-chip">Perbandingan: <b id="statCompBubble">0</b></span>
-              <span class="stat-chip">Tukar: <b id="statSwapBubble">0</b></span>
-            </div>
-            <div class="panel-title">Posisi Data</div>
+            <h3>BUBBLE SORT</h3>
             <div class="slots" id="slotsBoxBubble"></div>
           </div>
           <div class="card race-col" id="colInsertion">
-            <div class="race-head">
-              <h3>Insertion Sort</h3><span class="win-crown" id="crownInsertion">🏆</span><span class="fin-badge"
-                id="finInsertion">selesai</span>
-            </div>
-            <div class="panel-title">Pseudokode</div>
-            <div class="code-scroll">
-              <div class="code" id="codeBoxInsertion"></div>
-            </div>
-            <div class="stat-row">
-              <span class="stat-chip">Perbandingan: <b id="statCompInsertion">0</b></span>
-              <span class="stat-chip">Geser: <b id="statSwapInsertion">0</b></span>
-            </div>
-            <div class="panel-title">Posisi Data</div>
+            <h3>INSERTION SORT</h3>
             <div class="slots" id="slotsBoxInsertion"></div>
           </div>
         </div>
-        <div class="card note-bar" id="noteBar">Tekan <b>Jalankan Visualisasi</b> untuk mulai membandingkan kedua
-          algoritma.</div>
-        <div class="card playback">
-          <button class="btn" id="btnPrev">⏮ Sebelumnya</button>
-          <button class="btn primary" id="btnPlay">▶ Putar</button>
-          <button class="btn" id="btnNext">Berikutnya ⏭</button>
-          <button class="btn ghost" id="btnReset">Ulang</button>
-          <span class="progress" id="progressEl">0 / 0</span>
-          <div class="spacer"></div>
-          <div class="speed"><span>Kecepatan</span><input type="range" id="speedInput" min="250" max="1600" step="50"
-              value="750"></div>
-        </div>
-        <div class="card winner-banner" id="winnerBanner"></div>
-        <div class="apply-row">
-          <button class="btn" id="btnApply" disabled>✔ Terapkan urutan ini ke Data Mahasiswa</button>
-          <span class="apply-note" id="applyNote"></span>
-        </div>
-      </section>
-      <!-- ===== VIEW 3: BANDINGKAN ===== -->
-      <section class="view" id="view-compare">
-        <div class="view-head">
-          <h2>Bandingkan Algoritma</h2>
-          <p>Perbedaan konsep Bubble Sort dan Insertion Sort, serta hitungan nyata dari data kelas saat ini — lengkap
-            dengan tanda mana yang lebih cepat.</p>
-        </div>
-        <div class="card compare-table-wrap">
-          <table class="compare">
-            <thead>
-              <tr>
-                <th>Aspek</th>
-                <th>Bubble Sort</th>
-                <th>Insertion Sort</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="label">Cara kerja</td>
-                <td>Membandingkan dua elemen bersebelahan berulang kali, menukar jika urutannya salah, sehingga elemen
-                  terbesar/terkecil "menggelembung" ke ujung.</td>
-                <td>Mengambil satu elemen sebagai kunci, lalu menyisipkannya ke posisi yang tepat di antara
-                  elemen-elemen yang sudah terurut sebelumnya.</td>
-              </tr>
-              <tr>
-                <td class="label">Kompleksitas terbaik</td>
-                <td>O(n) — data sudah terurut</td>
-                <td>O(n) — data sudah terurut</td>
-              </tr>
-              <tr>
-                <td class="label">Kompleksitas rata-rata</td>
-                <td>O(n²)</td>
-                <td>O(n²)</td>
-              </tr>
-              <tr>
-                <td class="label">Kompleksitas terburuk</td>
-                <td>O(n²)</td>
-                <td>O(n²)</td>
-              </tr>
-              <tr>
-                <td class="label">Ruang tambahan</td>
-                <td>O(1)</td>
-                <td>O(1)</td>
-              </tr>
-              <tr>
-                <td class="label">Stabil?</td>
-                <td>Ya</td>
-                <td>Ya</td>
-              </tr>
-              <tr>
-                <td class="label">Cocok untuk</td>
-                <td>Data kecil, tujuan pembelajaran konsep pertukaran</td>
-                <td>Data kecil hingga sedang, atau data yang hampir terurut</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="card live-controls">
-          <div class="field"><label for="cmpKey">Urutkan berdasarkan</label>
-            <select id="cmpKey">
-              <option value="nilai">Nilai</option>
-              <option value="nama">Nama</option>
-              <option value="nim">NIM</option>
-            </select>
-          </div>
-          <div class="field"><label for="cmpOrder">Arah</label>
-            <select id="cmpOrder">
-              <option value="asc">Naik</option>
-              <option value="desc">Turun</option>
-            </select>
-          </div>
-          <button class="btn primary" id="btnCompareRun">Hitung dengan Data Saat Ini</button>
-        </div>
-        <div class="result-grid" id="resultGrid" style="display:none;">
-          <div class="card result-card" id="cardBubbleResult">
-            <h3>Bubble Sort <span class="win-tag" id="tagBubbleWin">Lebih cepat</span></h3>
-            <div class="bar-row"><span class="lbl">Perbandingan</span>
-              <div class="bar-track">
-                <div class="bar-fill" id="bBarComp" style="background:var(--gold)"></div>
-              </div><span class="num" id="bNumComp">0</span>
-            </div>
-            <div class="bar-row"><span class="lbl">Pertukaran</span>
-              <div class="bar-track">
-                <div class="bar-fill" id="bBarSwap" style="background:var(--red)"></div>
-              </div><span class="num" id="bNumSwap">0</span>
-            </div>
-            <div class="bar-row"><span class="lbl">Total operasi</span>
-              <div class="bar-track">
-                <div class="bar-fill" id="bBarTotal" style="background:var(--blue)"></div>
-              </div><span class="num" id="bNumTotal">0</span>
-            </div>
-          </div>
-          <div class="card result-card" id="cardInsertionResult">
-            <h3>Insertion Sort <span class="win-tag" id="tagInsertionWin">Lebih cepat</span></h3>
-            <div class="bar-row"><span class="lbl">Perbandingan</span>
-              <div class="bar-track">
-                <div class="bar-fill" id="iBarComp" style="background:var(--gold)"></div>
-              </div><span class="num" id="iNumComp">0</span>
-            </div>
-            <div class="bar-row"><span class="lbl">Geser</span>
-              <div class="bar-track">
-                <div class="bar-fill" id="iBarSwap" style="background:var(--red)"></div>
-              </div><span class="num" id="iNumSwap">0</span>
-            </div>
-            <div class="bar-row"><span class="lbl">Total operasi</span>
-              <div class="bar-track">
-                <div class="bar-fill" id="iBarTotal" style="background:var(--blue)"></div>
-              </div><span class="num" id="iNumTotal">0</span>
-            </div>
-          </div>
-        </div>
-        <div class="result-verdict" id="resultVerdict"></div>
       </section>
     </main>
   </div>

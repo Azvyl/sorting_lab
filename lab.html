@@ -4,11 +4,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Materi Sorting • Laboratorium Algoritma Pengurutan</title>
+  <title>Laboratorium Algoritma Sorting</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="css/themes.css">
   <link rel="stylesheet" href="css/lab.css">
@@ -18,17 +18,12 @@
   <div class="app">
     <header class="top">
       <div class="top-text">
-        <h1>Materi Sorting</h1>
-        <p><i>Sorting</i> (pengurutan) adalah proses menyusun ulang sekumpulan data ke dalam urutan tertentu menaik
-          (<i>ascending</i>) atau menurun (<i>descending</i>) berdasarkan suatu kunci pembanding, misalnya angka atau
-          huruf. Sorting termasuk salah satu operasi paling mendasar dalam ilmu komputer karena banyak algoritma dan
-          struktur data lain, seperti pencarian biner, bekerja jauh lebih efisien pada data yang sudah terurut.</p>
-        <p class="source-note">Sumber: Munir, R. (2016). <i>Algoritma dan Struktur Data</i>. Bandung: Informatika
-          &middot; Cormen, T. H., Leiserson, C. E., Rivest, R. L., &amp; Stein, C. (2009). <i>Introduction to
-            Algorithms</i> (3rd ed.). Cambridge, MA: MIT Press.</p>
+        <h1><span>❖</span> MATERI SORTING</h1>
+        <p>Pengurutan data dalam sistem memori komputer untuk mengoptimalkan efisiensi pencarian biner dan pemrosesan
+          struktur data.</p>
+        <p class="source-note">Rujukan: Munir, R. (2016) &middot; Cormen, T. H. et al. (2009) <i>Introduction to
+            Algorithms</i>.</p>
       </div>
-      <button id="themeToggle" class="theme-toggle" title="Ganti tema terang/gelap"
-        aria-label="Ganti tema terang/gelap">🌙</button>
     </header>
     <div class="layout">
       <nav class="menu" id="menu"></nav>
@@ -39,17 +34,17 @@
             <p id="algoDesc"></p>
           </div>
           <div class="custom-input-bar">
-            <label for="customArrayInput">Input Custom Array:</label>
-            <input type="text" id="customArrayInput" placeholder="Contoh: 45, 12, 89, 33, 7, 60">
-            <button type="button" class="btn-apply" id="btnApplyCustom">Terapkan</button>
+            <label for="customArrayInput">INPUT ARRAY:</label>
+            <input type="text" id="customArrayInput" placeholder="45, 12, 89, 33, 7, 60">
+            <button type="button" class="btn-apply" id="btnApplyCustom">TERAPKAN</button>
           </div>
           <div class="panels">
             <section class="panel">
               <div class="panel-title code-panel-title">
-                <span>Kode C</span>
-                <div class="code-mode-toggle" role="group" aria-label="Mode kode">
-                  <button type="button" class="mode-btn active" data-mode="array">1. Array</button>
-                  <button type="button" class="mode-btn" data-mode="pointer">2. Pointer</button>
+                <span>KODE PROGRAM (C)</span>
+                <div class="code-mode-toggle" role="group">
+                  <button type="button" class="mode-btn active" data-mode="array">1. ARRAY</button>
+                  <button type="button" class="mode-btn" data-mode="pointer">2. POINTER</button>
                 </div>
               </div>
               <div class="code-scroll">
@@ -57,23 +52,22 @@
               </div>
             </section>
             <section class="panel">
-              <div class="panel-title">Visualisasi</div>
+              <div class="panel-title">VISUALISASI MATRIX DATA</div>
               <div class="viz">
                 <div class="vars-row" id="varsRow"></div>
                 <div class="bars" id="bars"></div>
               </div>
             </section>
           </div>
-          <div class="note-bar" id="noteBar">Tekan <b>Putar</b> untuk memulai animasi.</div>
+          <div class="note-bar" id="noteBar">SYSTEM READY. Tekan <b>PUTAR</b> untuk eksekusi animasi.</div>
           <div class="controls">
-            <button class="btn" id="btnReset" title="Ke langkah awal">⏮ Reset</button>
-            <button class="btn" id="btnPrev" title="Langkah sebelumnya">◀ Mundur</button>
-            <button class="btn primary" id="btnPlay">▶ Putar</button>
-            <button class="btn" id="btnNext" title="Langkah berikutnya">Maju ▶</button>
-            <button class="btn" id="btnShuffle">🔀 Acak Ulang</button>
-            <div class="spacer"></div>
+            <button class="btn" id="btnReset">⟲ RESET</button>
+            <button class="btn" id="btnPrev">◀ MUNDUR</button>
+            <button class="btn primary" id="btnPlay">▶ PUTAR</button>
+            <button class="btn" id="btnNext">MAJU ▶</button>
+            <button class="btn" id="btnShuffle">⤮ ACAK</button>
             <div class="speed-wrap">
-              <span>Kecepatan</span>
+              <span>KECEPATAN</span>
               <input type="range" id="speed" min="60" max="900" value="380">
             </div>
             <div class="progress" id="progress">0 / 0</div>
@@ -81,27 +75,24 @@
         </div>
         <div id="compareView" class="compare-view" style="display:none">
           <div class="algo-head">
-            <h2>Perbandingan 7 Algoritma Sorting</h2>
-            <p>Kompleksitas waktu &amp; ruang, kestabilan, serta kelebihan (+) dan kekurangan (&minus;) tiap algoritma
-              yang ada di sebelah kiri.</p>
+            <h2>PERBANDINGAN ALGORITMA</h2>
+            <p>Analisis matriks efisiensi kompleksitas waktu dan ruang data.</p>
           </div>
           <div class="compare-table-wrap">
             <table class="compare-table" id="compareTable">
               <thead>
                 <tr>
-                  <th>Peringkat**</th>
-                  <th>Algoritma</th>
-                  <th>Kecepatan relatif*</th>
-                  <th>Stabil</th>
-                  <th>In-place</th>
-                  <th>Adaptif</th>
+                  <th>RANK</th>
+                  <th>ALGORITMA</th>
+                  <th>KECEPATAN</th>
+                  <th>STABIL</th>
+                  <th>IN-PLACE</th>
+                  <th>ADAPTIF</th>
                 </tr>
               </thead>
               <tbody id="compareTableBody"></tbody>
             </table>
           </div>
-          <div class="compare-hint">*Ilustrasi performa relatif untuk data berukuran besar (perkiraan, bukan hasil
-            benchmark presisi). **Diurutkan dari yang paling sering dipakai &amp; paling mudah dipelajari.</div>
           <div class="compare-grid" id="compareGrid"></div>
         </div>
       </main>
