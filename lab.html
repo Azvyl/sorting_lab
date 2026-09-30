@@ -411,6 +411,11 @@
       opacity: .3;
     }
 
+    .bar-slot.empty .bar-fill {
+      border: 2px dashed var(--border);
+      background: transparent !important;
+    }
+
     .bar-badge {
       font-family: var(--mono);
       font-size: 11px;
@@ -448,6 +453,11 @@
     .bar-fill[data-state="swap"] {
       background: var(--coral);
       transform: scaleY(1.03);
+    }
+
+    .bar-fill[data-state="shift"] {
+      background: var(--amber);
+      transform: translateX(4px);
     }
 
     .bar-fill[data-state="sorted"] {
@@ -959,7 +969,6 @@
 
 <body>
   <div class="app">
-
     <header class="top">
       <div class="top-text">
         <h1>Materi Sorting</h1>
@@ -974,17 +983,14 @@
       <button id="themeToggle" class="theme-toggle" title="Ganti tema terang/gelap"
         aria-label="Ganti tema terang/gelap">🌙</button>
     </header>
-
     <div class="layout">
       <nav class="menu" id="menu"></nav>
-
       <main class="content">
         <div id="algoView">
           <div class="algo-head">
             <h2 id="algoTitle"></h2>
             <p id="algoDesc"></p>
           </div>
-
           <div class="panels">
             <section class="panel">
               <div class="panel-title code-panel-title">
@@ -1006,9 +1012,7 @@
               </div>
             </section>
           </div>
-
           <div class="note-bar" id="noteBar">Tekan <b>Putar</b> untuk memulai animasi.</div>
-
           <div class="controls">
             <button class="btn" id="btnReset" title="Ke langkah awal">⏮ Reset</button>
             <button class="btn" id="btnPrev" title="Langkah sebelumnya">◀ Mundur</button>
@@ -1023,7 +1027,6 @@
             <div class="progress" id="progress">0 / 0</div>
           </div>
         </div>
-
         <div id="compareView" class="compare-view" style="display:none">
           <div class="algo-head">
             <h2>Perbandingan 7 Algoritma Sorting</h2>
@@ -1046,14 +1049,12 @@
             </table>
           </div>
           <div class="compare-hint">*Ilustrasi performa relatif untuk data berukuran besar (perkiraan, bukan hasil
-            benchmark presisi). **Diurutkan dari yang paling sering dipakai &amp; paling mudah dipelajari, ke yang
-            paling jarang.</div>
+            benchmark presisi). **Diurutkan dari yang paling sering dipakai &amp; paling mudah dipelajari.</div>
           <div class="compare-grid" id="compareGrid"></div>
         </div>
       </main>
     </div>
   </div>
-
   <script>
     (function () {
       "use strict";
@@ -1070,8 +1071,8 @@
       /* ---------- step factory ---------- */
       function baseStep(a, sortedSet, n) {
         return {
-          line: 0, array: a.slice(), compare: [], swap: [], sorted: sortedSet.slice(),
-          pivot: null, active: null, range: [0, n - 1], badge: null, vars: {}, note: ""
+          line: 0, array: a.slice(), compare: [], swap: [], shift: [], sorted: sortedSet.slice(),
+          pivot: null, active: null, range: [0, n - 1], badge: null, vars: {}, note: "", hole: null
         };
       }
 
@@ -1268,7 +1269,7 @@
       /* ---- 4. Insertion Sort ---- */
       ALGORITHMS.insertion = {
         name: "Insertion Sort",
-        desc: "Mengambil satu elemen sebagai \u201ckey\u201d, lalu menggeser elemen-elemen yang lebih besar ke kanan sampai key bisa disisipkan pada posisi yang tepat.",
+        desc: "Mengambil satu elemen sebagai key, membandingkannya dengan elemen terurut di sebelah kirinya, lalu menggeser elemen yang lebih besar ke kanan hingga key disisipkan di posisi presisi.",
         code: [
           "void insertion_sort(int a[], int n) {",
           "    for (int i = 1; i < n; i++) {",
@@ -1298,23 +1299,92 @@
         build(arr) {
           const a = cloneArr(arr), n = a.length, steps = [];
           const push = (o) => steps.push(Object.assign(baseStep(a, range(1), n), o));
+
           for (let i = 1; i < n; i++) {
-            push({ line: 1, sorted: range(i), vars: { i }, note: `Mulai i = ${i}.` });
+            push({ line: 1, sorted: range(i), vars: { i }, note: `Mulai iterasi i = ${i}.` });
+
             const key = a[i];
-            push({ line: 2, sorted: range(i), active: i, vars: { i, key }, note: `key = a[${i}] = ${key}.` });
+            let hole = i;
+
+            push({
+              line: 2,
+              sorted: range(i),
+              hole: hole,
+              vars: { i, key },
+              note: `Angkat key = a[${i}] = ${key} ke memori sementara. Slot a[${i}] kini kosong.`
+            });
+
             let j = i - 1;
-            push({ line: 3, sorted: range(i), active: i, vars: { i, j, key }, note: `j = ${j}.` });
+            push({
+              line: 3,
+              sorted: range(i),
+              hole: hole,
+              vars: { i, j, key },
+              note: `Inisialisasi penunjuk j = i - 1 = ${j}.`
+            });
+
             while (j >= 0 && a[j] > key) {
-              push({ line: 4, sorted: range(i), compare: [j], active: i, vars: { j, key }, note: `a[${j}] = ${a[j]} > key (${key}) \u2014 harus digeser.` });
-              a[j + 1] = a[j];
-              push({ line: 5, sorted: range(i), swap: [j, j + 1], vars: { j, key }, note: `Geser a[${j}] ke posisi ${j + 1}.` });
+              push({
+                line: 4,
+                sorted: range(i),
+                compare: [j],
+                hole: hole,
+                vars: { j, key },
+                note: `Bandingkan: a[${j}] = ${a[j]} > key (${key}) \u2014 Benar, persiapkan pergeseran a[${j}] ke kanan.`
+              });
+
+              a[hole] = a[j];
+              hole = j;
+
+              push({
+                line: 5,
+                sorted: range(i),
+                shift: [j + 1],
+                hole: hole,
+                vars: { j, key },
+                note: `Geser elemen ${a[j + 1]} dari indeks ${j} ke indeks ${j + 1}.`
+              });
+
               j--;
-              push({ line: 6, sorted: range(i), vars: { j, key }, note: `j-- \u2192 j = ${j}.` });
+              push({
+                line: 6,
+                sorted: range(i),
+                hole: hole,
+                vars: { j, key },
+                note: `Mundurkan penunjuk j \u2192 j = ${j}.`
+              });
             }
+
+            if (j >= 0) {
+              push({
+                line: 4,
+                sorted: range(i),
+                compare: [j],
+                hole: hole,
+                vars: { j, key },
+                note: `Bandingkan: a[${j}] = ${a[j]} <= key (${key}) \u2014 Kondisi dihentikan. Posisi sisip di indeks ${j + 1}.`
+              });
+            } else {
+              push({
+                line: 4,
+                sorted: range(i),
+                hole: hole,
+                vars: { j, key },
+                note: `j = ${j} < 0 \u2014 Mencapai awal array. Posisi sisip di indeks 0.`
+              });
+            }
+
             a[j + 1] = key;
-            push({ line: 8, sorted: range(i + 1), vars: { j, key }, note: `Sisipkan key (${key}) di posisi ${j + 1}.` });
+            push({
+              line: 8,
+              sorted: range(i + 1),
+              active: j + 1,
+              vars: { j, key },
+              note: `Sisipkan nilai key (${key}) ke posisi target a[${j + 1}]. Subarray [0..${i}] kini terurut.`
+            });
           }
-          push({ line: 10, sorted: range(n), note: "Selesai! Array sudah terurut." });
+
+          push({ line: 10, sorted: range(n), note: "Selesai! Seluruh array berhasil diurutkan secara presisi." });
           return steps;
         }
       };
@@ -1367,7 +1437,7 @@
               while (j >= gap && a[j - gap] > temp) {
                 push({ line: 5, compare: [j - gap], active: i, vars: { gap, j, temp }, note: `a[${j - gap}] = ${a[j - gap]} > temp (${temp}) \u2014 geser.` });
                 a[j] = a[j - gap];
-                push({ line: 6, swap: [j - gap, j], vars: { gap, j, temp }, note: `a[${j}] = a[${j - gap}].` });
+                push({ line: 6, shift: [j - gap, j], vars: { gap, j, temp }, note: `a[${j}] = a[${j - gap}].` });
                 j -= gap;
                 push({ line: 7, vars: { gap, j, temp }, note: `j -= gap \u2192 j = ${j}.` });
               }
@@ -1432,7 +1502,6 @@
           const a = cloneArr(arr), n = a.length, steps = [];
           let sortedSet = [];
           const push = (o) => steps.push(Object.assign(baseStep(a, sortedSet, n), o));
-
           function recurse(low, high) {
             push({ line: 1, range: [Math.max(low, 0), Math.min(high, n - 1)], vars: { low, high }, note: `Panggil quick_sort(low = ${low}, high = ${high}).` });
             if (low < high) {
@@ -1662,10 +1731,10 @@
         const pct = Math.max(30, 100 - (rank - 1) * 11.67);
         const tier = rank <= 2 ? "fast" : (rank <= 4 ? "mid" : "slow");
         return `
-      <div class="speed-illus">
-        <div class="track"><div class="fill ${tier}" style="width:${pct.toFixed(0)}%"></div></div>
-        <span class="label">#${rank}</span>
-      </div>`;
+          <div class="speed-illus">
+            <div class="track"><div class="fill ${tier}" style="width:${pct.toFixed(0)}%"></div></div>
+            <span class="label">#${rank}</span>
+          </div>`;
       }
 
       function renderCompareTable() {
@@ -1676,13 +1745,13 @@
           const c = COMPARE[key];
           const tr = document.createElement("tr");
           tr.innerHTML = `
-        <td class="mono-cell">#${idx + 1}</td>
-        <td class="algo-name">${algo.name}</td>
-        <td>${speedIllusHtml(c.speedRank)}</td>
-        <td class="center">${tickHtml(c.stable)}</td>
-        <td class="center">${tickHtml(c.inPlace)}</td>
-        <td class="center">${tickHtml(c.adaptive)}</td>
-      `;
+            <td class="mono-cell">#${idx + 1}</td>
+            <td class="algo-name">${algo.name}</td>
+            <td>${speedIllusHtml(c.speedRank)}</td>
+            <td class="center">${tickHtml(c.stable)}</td>
+            <td class="center">${tickHtml(c.inPlace)}</td>
+            <td class="center">${tickHtml(c.adaptive)}</td>
+          `;
           body.appendChild(tr);
         });
       }
@@ -1697,30 +1766,30 @@
           const card = document.createElement("div");
           card.className = "compare-card";
           card.innerHTML = `
-        <div class="compare-card-head">
-          <h3>${algo.name}</h3>
-          <span class="rank-badge">#${idx + 1}</span>
-        </div>
-        <div class="compare-speed-row">
-          <span class="speed-label">Kecepatan relatif*</span>
-          ${speedIllusHtml(c.speedRank)}
-        </div>
-        <div class="compare-chips">
-          <span class="chip"><b>Stabil</b> ${c.stable ? "Ya" : "Tidak"}</span>
-          <span class="chip"><b>In-place</b> ${c.inPlace ? "Ya" : "Tidak"}</span>
-          <span class="chip"><b>Adaptif</b> ${c.adaptive ? "Ya" : "Tidak"}</span>
-        </div>
-        <div class="pm-grid">
-          <div class="pm-col plus">
-            <h4>Kelebihan</h4>
-            <ul>${c.plus.map(t => `<li>${escapeHtml(t)}</li>`).join("")}</ul>
-          </div>
-          <div class="pm-col minus">
-            <h4>Kekurangan</h4>
-            <ul>${c.minus.map(t => `<li>${escapeHtml(t)}</li>`).join("")}</ul>
-          </div>
-        </div>
-      `;
+            <div class="compare-card-head">
+              <h3>${algo.name}</h3>
+              <span class="rank-badge">#${idx + 1}</span>
+            </div>
+            <div class="compare-speed-row">
+              <span class="speed-label">Kecepatan relatif*</span>
+              ${speedIllusHtml(c.speedRank)}
+            </div>
+            <div class="compare-chips">
+              <span class="chip"><b>Stabil</b> ${c.stable ? "Ya" : "Tidak"}</span>
+              <span class="chip"><b>In-place</b> ${c.inPlace ? "Ya" : "Tidak"}</span>
+              <span class="chip"><b>Adaptif</b> ${c.adaptive ? "Ya" : "Tidak"}</span>
+            </div>
+            <div class="pm-grid">
+              <div class="pm-col plus">
+                <h4>Kelebihan</h4>
+                <ul>${c.plus.map(t => `<li>${escapeHtml(t)}</li>`).join("")}</ul>
+              </div>
+              <div class="pm-col minus">
+                <h4>Kekurangan</h4>
+                <ul>${c.minus.map(t => `<li>${escapeHtml(t)}</li>`).join("")}</ul>
+              </div>
+            </div>
+          `;
           grid.appendChild(card);
         });
       }
@@ -1758,11 +1827,9 @@
         btn.addEventListener("click", () => selectAlgo(key));
         menuEl.appendChild(btn);
       });
-
       const menuSep = document.createElement("div");
       menuSep.className = "menu-sep";
       menuEl.appendChild(menuSep);
-
       const compareBtn = document.createElement("button");
       compareBtn.className = "compare-btn";
       compareBtn.dataset.key = "compare";
@@ -1802,9 +1869,11 @@
           codeBox.appendChild(row);
         });
       }
+
       function escapeHtml(s) {
         return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
       }
+
       function highlightLine(lineIdx) {
         const rows = codeBox.children;
         for (let i = 0; i < rows.length; i++) {
@@ -1824,11 +1893,11 @@
           const slot = document.createElement("div");
           slot.className = "bar-slot";
           slot.innerHTML = `
-        <div class="bar-badge"></div>
-        <div class="bar-value"></div>
-        <div class="bar-fill" style="height:10px"></div>
-        <div class="bar-index">${i}</div>
-      `;
+            <div class="bar-badge"></div>
+            <div class="bar-value"></div>
+            <div class="bar-fill" style="height:10px"></div>
+            <div class="bar-index">${i}</div>
+          `;
           barsEl.appendChild(slot);
           barEls.push({
             slot,
@@ -1842,30 +1911,43 @@
       function renderStep(step) {
         const maxVal = Math.max(...step.array, 1);
         const n = step.array.length;
+
         for (let i = 0; i < n; i++) {
           const v = step.array[i];
           const el = barEls[i];
-          el.value.textContent = v;
-          el.fill.style.height = Math.max(10, (v / maxVal) * 220) + "px";
 
-          let state = "default";
-          if (step.sorted.includes(i)) state = "sorted";
-          if (step.compare.includes(i)) state = "compare";
-          if (step.active === i) state = "active";
-          if (step.pivot === i) state = "pivot";
-          if (step.swap.includes(i)) state = "swap";
-          el.fill.dataset.state = state;
+          if (step.hole === i) {
+            el.slot.classList.add("empty");
+            el.value.textContent = "-";
+            el.fill.style.height = "10px";
+            el.fill.dataset.state = "default";
+          } else {
+            el.slot.classList.remove("empty");
+            el.value.textContent = v;
+            el.fill.style.height = Math.max(10, (v / maxVal) * 220) + "px";
+
+            let state = "default";
+            if (step.sorted.includes(i)) state = "sorted";
+            if (step.compare.includes(i)) state = "compare";
+            if (step.active === i) state = "active";
+            if (step.pivot === i) state = "pivot";
+            if (step.swap && step.swap.includes(i)) state = "swap";
+            if (step.shift && step.shift.includes(i)) state = "shift";
+
+            el.fill.dataset.state = state;
+          }
 
           const inRange = step.range ? (i >= step.range[0] && i <= step.range[1]) : true;
           el.slot.classList.toggle("dim", !inRange);
 
           if (step.badge && step.badge.index === i) {
-            el.badge.textContent = "digit " + step.badge.text;
+            el.badge.textContent = step.badge.text;
             el.badge.classList.add("show");
           } else {
             el.badge.classList.remove("show");
           }
         }
+
         highlightLine(step.line);
 
         varsRow.innerHTML = "";
@@ -1887,23 +1969,27 @@
         stepIndex = Math.max(0, Math.min(steps.length - 1, idx));
         renderStep(steps[stepIndex]);
       }
+
       function stepForward() {
         if (stepIndex >= steps.length - 1) { pause(); return false; }
         stepIndex++;
         renderStep(steps[stepIndex]);
         return true;
       }
+
       function stepBack() {
         if (stepIndex <= 0) return;
         stepIndex--;
         renderStep(steps[stepIndex]);
       }
+
       function tick() {
         if (!playing) return;
         const ok = stepForward();
         if (!ok) return;
         playTimer = setTimeout(tick, Number(speedInput.value));
       }
+
       function play() {
         if (stepIndex >= steps.length - 1) stepIndex = 0;
         playing = true;
@@ -1911,6 +1997,7 @@
         clearTimeout(playTimer);
         playTimer = setTimeout(tick, Number(speedInput.value));
       }
+
       function pause() {
         playing = false;
         btnPlay.textContent = "\u25B6 Putar";
@@ -1925,17 +2012,14 @@
         pause();
         currentKey = key;
         updateMenuActive();
-
         if (key === "compare") {
           algoViewEl.style.display = "none";
           compareViewEl.style.display = "flex";
           renderCompareGrid();
           return;
         }
-
         compareViewEl.style.display = "none";
         algoViewEl.style.display = "block";
-
         const algo = ALGORITHMS[key];
         algoTitle.textContent = algo.name;
         algoDesc.textContent = algo.desc;
@@ -1964,7 +2048,6 @@
       /* ---------- theme toggle ---------- */
       const themeToggle = document.getElementById("themeToggle");
       const THEME_KEY = "sorting-lab-theme";
-
       function systemPrefersDark() {
         return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
       }
@@ -1999,7 +2082,6 @@
 
       /* ---------- init ---------- */
       selectAlgo("bubble");
-
     })();
   </script>
 </body>
