@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Studi Kasus Sorting — Sistem Informasi Kelas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      --cover: #1E3A2B;
+      --cover-2: #16291E;
+      --cover-text: #EFE9D2;
+      --cover-text-dim: #A9BBA9;
+      --paper: #FFFFFF;
+      --paper-2: #F7F7F7;
+      --paper-line: #E5E5E5;
+      --border: #E0E0E0;
+      --ink: #000000;
+      --muted: #595959;
+      --red: #A63A2E;
+      --red-soft: #A63A2E1c;
+      --blue: #2F4B7C;
+      --blue-soft: #2F4B7C1c;
+      --gold: #B9862E;
+      --gold-soft: #B9862E22;
+      --ok: #3E7D53;
+      --ok-soft: #3E7D5320;
+      --serif: 'Source Serif 4', Georgia, serif;
+      --sans: 'Inter', system-ui, sans-serif;
+      --mono: 'IBM Plex Mono', ui-monospace, monospace;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --cover: #0D0D0D;
+        --cover-2: #000000;
+        --cover-text: #EDEDED;
+        --cover-text-dim: #9A9A9A;
+        --paper: #121212;
+        --paper-2: #1A1A1A;
+        --paper-line: #2A2A2A;
+        --border: #2C2C2C;
+        --ink: #ECECEC;
+        --muted: #9A9A9A;
+        --red: #E0897B;
+        --red-soft: #E0897B22;
+        --blue: #8FADDD;
+        --blue-soft: #8FADDD22;
+        --gold: #E0B15E;
+        --gold-soft: #E0B15E26;
+        --ok: #84CB9C;
+        --ok-soft: #84CB9C22;
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --cover: #0D0D0D;
+      --cover-2: #000000;
+      --cover-text: #EDEDED;
+      --cover-text-dim: #9A9A9A;
+      --paper: #121212;
+      --paper-2: #1A1A1A;
+      --paper-line: #2A2A2A;
+      --border: #2C2C2C;
+      --ink: #ECECEC;
+      --muted: #9A9A9A;
+      --red: #E0897B;
+      --red-soft: #E0897B22;
+      --blue: #8FADDD;
+      --blue-soft: #8FADDD22;
+      --gold: #E0B15E;
+      --gold-soft: #E0B15E26;
+      --ok: #84CB9C;
+      --ok-soft: #84CB9C22;
+    }
+
+    html {
+      height: 100%;
+      scroll-padding-top: env(safe-area-inset-top, 0px);
+      -webkit-text-size-adjust: 100%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: var(--serif);
+      font-weight: 600;
+      margin: 0;
+    }
+
+    button,
+    select,
+    input {
+      font-family: var(--sans);
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 248px 1fr;
+      min-height: 100vh;
+    }
+
+    /* ---------- sampul / sidebar ---------- */
+    .cover {
+      background: linear-gradient(180deg, var(--cover), var(--cover-2));
+      color: var(--cover-text);
+      padding: 22px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .cover .brand {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .cover .brand .mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--gold);
+      color: var(--cover-2);
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+    }
+
+    .cover .theme-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      border: 1px solid #ffffff2a;
+      background: transparent;
+      color: var(--cover-text);
+      cursor: pointer;
+      font-size: 14px;
+      flex: none;
+    }
+
+    .cover .theme-btn:hover {
+      background: #ffffff14;
+    }
+
+    .cover h1 {
+      font-size: 19px;
+      line-height: 1.3;
+      margin-top: 12px;
+    }
+
+    .cover .kelas-meta {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--cover-text-dim);
+      margin-top: 6px;
+      line-height: 1.6;
+    }
+
+    .cover nav {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-top: 4px;
+    }
+
+    .cover nav button {
+      text-align: left;
+      background: transparent;
+      border: none;
+      color: var(--cover-text-dim);
+      cursor: pointer;
+      padding: 9px 10px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 500;
+      display: flex;
+      gap: 9px;
+      align-items: center;
+      transition: background .15s ease, color .15s ease;
+    }
+
+    .cover nav button .tick {
+      font-family: var(--mono);
+      font-size: 11px;
+      opacity: .6;
+      width: 14px;
+    }
+
+    .cover nav button:hover {
+      background: #ffffff10;
+      color: var(--cover-text);
+    }
+
+    .cover nav button.active {
+      background: #ffffff1c;
+      color: #fff;
+    }
+
+    .cover .spacer {
+      flex: 1;
+    }
+
+    .cover .footnote {
+      font-size: 11px;
+      color: var(--cover-text-dim);
+      line-height: 1.6;
+      border-top: 1px solid #ffffff1e;
+      padding-top: 12px;
+    }
+
+    /* ---------- kertas / konten ---------- */
+    main.paper {
+      padding: 26px 30px 60px;
+      min-width: 0;
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .view-head {
+      margin-bottom: 18px;
+    }
+
+    .view-head h2 {
+      font-size: 24px;
+      letter-spacing: -.01em;
+    }
+
+    .view-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      max-width: 64ch;
+      line-height: 1.55;
+    }
+
+    .card {
+      background: var(--paper-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    /* form tambah mahasiswa */
+    .add-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: flex-end;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .field input,
+    .field select {
+      font-size: 13.5px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--paper);
+      color: var(--ink);
+      min-width: 0;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      outline: 2px solid var(--blue);
+      outline-offset: 1px;
+    }
+
+    .field.nim {
+      width: 110px;
+    }
+
+    .field.nama {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .field.nilai {
+      width: 90px;
+    }
+
+    .btn {
+      font-weight: 600;
+      font-size: 13px;
+      padding: 9px 15px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--paper);
+      color: var(--ink);
+      cursor: pointer;
+      transition: background .15s ease, transform .1s ease;
+    }
+
+    .btn:hover {
+      background: var(--paper-line);
+    }
+
+    .btn:active {
+      transform: scale(.97);
+    }
+
+    .btn:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    .btn.primary {
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink);
+    }
+
+    .btn.primary:hover {
+      opacity: .88;
+      background: var(--ink);
+    }
+
+    .btn.ghost {
+      background: transparent;
+    }
+
+    .form-error {
+      font-size: 12.5px;
+      color: var(--red);
+      width: 100%;
+      min-height: 16px;
+    }
+
+    /* tabel ledger */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table.roster {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 560px;
+    }
+
+    table.roster th,
+    table.roster td {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 13.5px;
+      border-bottom: 1px solid var(--paper-line);
+    }
+
+    table.roster thead th {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    table.roster td.nim,
+    table.roster td.nilai {
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+
+    table.roster tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    table.roster tbody tr:hover {
+      background: var(--paper-line)55;
+    }
+
+    .del-btn {
+      border: none;
+      background: transparent;
+      color: var(--red);
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    .del-btn:hover {
+      background: var(--red-soft);
+    }
+
+    .empty-row td {
+      text-align: center;
+      color: var(--muted);
+      padding: 26px;
+      font-style: italic;
+    }
+
+    .roster-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      font-size: 12px;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+
+    .applied-tag {
+      font-family: var(--mono);
+      background: var(--ok-soft);
+      color: var(--ok);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+
+    /* ---------- panel kontrol sort ---------- */
+    .sort-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-end;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+
+    .sort-controls .field select {
+      min-width: 150px;
+    }
+
+    .stat-chip {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 7px;
+      color: var(--muted);
+    }
+
+    .stat-chip b {
+      color: var(--ink);
+    }
+
+    /* ---------- race: dua algoritma berdampingan ---------- */
+    .race-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items: start;
+      margin-bottom: 0;
+    }
+
+    .race-col {
+      overflow: hidden;
+      transition: box-shadow .25s ease, border-color .25s ease;
+    }
+
+    .race-col.winner {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px var(--gold-soft) inset;
+    }
+
+    .race-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 14px 0;
+    }
+
+    .race-head h3 {
+      font-size: 15px;
+    }
+
+    .fin-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: var(--ok-soft);
+      color: var(--ok);
+      visibility: hidden;
+      margin-left: auto;
+    }
+
+    .fin-badge.show {
+      visibility: visible;
+    }
+
+    .win-crown {
+      font-size: 13px;
+      visibility: hidden;
+    }
+
+    .win-crown.show {
+      visibility: visible;
+    }
+
+    .panel-title {
+      padding: 10px 14px 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .code-scroll {
+      max-height: 210px;
+      overflow: auto;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .code {
+      font-family: var(--mono);
+      font-size: 11.8px;
+      line-height: 1.85;
+      padding: 8px 0;
+      white-space: pre;
+    }
+
+    .code .line {
+      display: flex;
+      gap: 10px;
+      padding: 1px 14px;
+      border-left: 3px solid transparent;
+    }
+
+    .code .line .ln {
+      color: var(--muted);
+      width: 15px;
+      flex: none;
+      text-align: right;
+      user-select: none;
+    }
+
+    .code .line.hl {
+      background: var(--gold-soft);
+      border-left-color: var(--gold);
+    }
+
+    .code .line.hl .ln {
+      color: var(--gold);
+    }
+
+    .stat-row {
+      display: flex;
+      gap: 8px;
+      padding: 10px 14px;
+      flex-wrap: wrap;
+    }
+
+    .slots {
+      padding: 6px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .slot-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 9px;
+      border-radius: 9px;
+      border: 1.5px solid var(--border);
+      background: var(--paper);
+      transition: border-color .2s ease, background .2s ease, transform .15s ease;
+    }
+
+    .slot-row .pos {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--muted);
+      width: 14px;
+      flex: none;
+    }
+
+    .slot-row .nim {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      width: 56px;
+      flex: none;
+    }
+
+    .slot-row .nama {
+      font-size: 12.5px;
+      font-weight: 500;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .slot-row .nilai {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      font-weight: 600;
+      width: 30px;
+      text-align: right;
+      flex: none;
+    }
+
+    .slot-row .tag {
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 5px;
+      flex: none;
+      visibility: hidden;
+    }
+
+    .slot-row[data-state="compare"] {
+      border-color: var(--gold);
+      background: var(--gold-soft);
+    }
+
+    .slot-row[data-state="compare"] .tag {
+      visibility: visible;
+      background: var(--gold);
+      color: #1b1305;
+    }
+
+    .slot-row[data-state="swap"] {
+      border-color: var(--red);
+      background: var(--red-soft);
+      transform: scale(1.012);
+    }
+
+    .slot-row[data-state="swap"] .tag {
+      visibility: visible;
+      background: var(--red);
+      color: #fff;
+    }
+
+    .slot-row[data-state="active"] {
+      border-color: var(--blue);
+      background: var(--blue-soft);
+    }
+
+    .slot-row[data-state="active"] .tag {
+      visibility: visible;
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .slot-row[data-state="sorted"] {
+      border-color: var(--ok);
+    }
+
+    .slot-row[data-state="sorted"] .tag {
+      visibility: visible;
+      background: var(--ok-soft);
+      color: var(--ok);
+    }
+
+    .note-bar {
+      padding: 12px 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      min-height: 20px;
+      margin-top: 14px;
+    }
+
+    .note-bar div {
+      margin: 2px 0;
+    }
+
+    .note-bar b {
+      color: var(--gold);
+    }
+
+    .playback {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 12px 14px;
+      margin-top: 12px;
+    }
+
+    .playback .progress {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .playback .spacer {
+      flex: 1;
+    }
+
+    .playback .speed {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .playback input[type="range"] {
+      accent-color: var(--gold);
+    }
+
+    .winner-banner {
+      margin-top: 14px;
+      padding: 14px 16px;
+      font-size: 14px;
+      line-height: 1.55;
+      display: none;
+      border-color: var(--gold);
+      background: var(--gold-soft);
+    }
+
+    .winner-banner.show {
+      display: block;
+    }
+
+    .winner-banner b {
+      color: var(--gold);
+    }
+
+    .apply-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .apply-note {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    /* ---------- bandingkan ---------- */
+    .compare-table-wrap {
+      overflow-x: auto;
+      margin-bottom: 16px;
+    }
+
+    table.compare {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 600px;
+    }
+
+    table.compare th,
+    table.compare td {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 13px;
+      border-bottom: 1px solid var(--paper-line);
+      vertical-align: top;
+    }
+
+    table.compare thead th {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--muted);
+      background: var(--paper);
+    }
+
+    table.compare td.label {
+      color: var(--muted);
+      font-weight: 600;
+      width: 150px;
+    }
+
+    table.compare tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .live-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: flex-end;
+      padding: 14px 16px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      padding: 0 0 16px;
+    }
+
+    .result-card {
+      padding: 14px 16px;
+      transition: box-shadow .25s ease, border-color .25s ease;
+    }
+
+    .result-card.winner-card {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px var(--gold-soft) inset;
+    }
+
+    .result-card h3 {
+      font-size: 14.5px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .result-card .win-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: var(--gold);
+      color: #241a04;
+      visibility: hidden;
+    }
+
+    .result-card .win-tag.show {
+      visibility: visible;
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      margin: 6px 0;
+    }
+
+    .bar-row .lbl {
+      width: 96px;
+      flex: none;
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 9px;
+      border-radius: 5px;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 5px 0 0 5px;
+    }
+
+    .bar-row .num {
+      font-family: var(--mono);
+      width: 30px;
+      text-align: right;
+      flex: none;
+      color: var(--ink);
+    }
+
+    .result-verdict {
+      font-size: 13px;
+      color: var(--ink);
+      padding: 0 16px 14px;
+      line-height: 1.55;
+    }
+
+    .result-verdict b {
+      color: var(--gold);
+    }
+
+    @media (max-width: 860px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .cover {
+        position: static;
+        height: auto;
+        padding: 16px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+      }
+
+      .cover nav {
+        flex-direction: row;
+        overflow-x: auto;
+        gap: 4px;
+      }
+
+      .cover nav button {
+        white-space: nowrap;
+      }
+
+      .cover .footnote {
+        display: none;
+      }
+
+      main.paper {
+        padding: 20px 16px 50px;
+      }
+
+      .race-grid,
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .field.nama {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <aside class="cover">
+      <div class="brand">
+        <div class="mark">SK</div>
+        <button class="theme-btn" id="themeToggle" title="Ganti tema" aria-label="Ganti tema">🌙</button>
+      </div>
+      <div>
+        <h1>Studi Kasus Sorting<br><span
+            style="font-size:13px;font-weight:500;color:var(--cover-text-dim);font-family:var(--sans);">Sistem Informasi
+            Kelas</span></h1>
+        <div class="kelas-meta">RPL&#8209;3B &middot; Semester Ganjil 2026&#47;2027<br>Wali kelas: Pak Akbar</div>
+      </div>
+      <nav>
+        <button data-view="data" class="active"><span class="tick">01</span> Data Mahasiswa</button>
+        <button data-view="sort"><span class="tick">02</span> Visualisasi Urutan</button>
+        <button data-view="compare"><span class="tick">03</span> Bandingkan Algoritma</button>
+      </nav>
+      <div class="spacer"></div>
+      <div class="footnote">Data tersimpan di perangkat ini saja.<br>Tidak dibagikan ke siapa pun.</div>
+    </aside>
+
+    <main class="paper">
+
+      <!-- ===== VIEW 1: DATA MAHASISWA ===== -->
+      <section class="view active" id="view-data">
+        <div class="view-head">
+          <h2>Data Mahasiswa</h2>
+          <p>Kelola daftar mahasiswa satu kelas: tambah, hapus, dan lihat nilai. Data ini yang akan diurutkan pada tahap
+            visualisasi.</p>
+        </div>
+
+        <form class="card add-form" id="addForm">
+          <div class="field nim"><label for="inNim">NIM</label><input id="inNim" type="text" inputmode="numeric"
+              placeholder="2401xxxx" maxlength="12"></div>
+          <div class="field nama"><label for="inNama">Nama lengkap</label><input id="inNama" type="text"
+              placeholder="Nama mahasiswa" maxlength="40"></div>
+          <div class="field nilai"><label for="inNilai">Nilai</label><input id="inNilai" type="number" min="0" max="100"
+              placeholder="0–100"></div>
+          <button type="submit" class="btn primary">+ Tambah</button>
+          <div class="form-error" id="formError"></div>
+        </form>
+
+        <div class="card table-wrap">
+          <table class="roster">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>NIM</th>
+                <th>Nama</th>
+                <th>Nilai</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="rosterBody"></tbody>
+          </table>
+          <div class="roster-foot">
+            <span id="rosterCount">0 mahasiswa</span>
+            <span id="appliedTagWrap"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== VIEW 2: VISUALISASI URUTAN (Bubble & Insertion berdampingan) ===== -->
+      <section class="view" id="view-sort">
+        <div class="view-head">
+          <h2>Visualisasi Pengurutan</h2>
+          <p>Bubble Sort dan Insertion Sort dijalankan berdampingan pada data yang sama, sehingga terlihat jelas
+            perbedaan cara kerja dan jumlah langkahnya. Yang lebih cepat selesai akan ditandai di akhir.</p>
+        </div>
+
+        <div class="card sort-controls">
+          <div class="field"><label for="selKey">Urutkan berdasarkan</label>
+            <select id="selKey">
+              <option value="nilai">Nilai</option>
+              <option value="nama">Nama</option>
+              <option value="nim">NIM</option>
+            </select>
+          </div>
+          <div class="field"><label for="selOrder">Arah</label>
+            <select id="selOrder">
+              <option value="asc">Naik (kecil → besar)</option>
+              <option value="desc">Turun (besar → kecil)</option>
+            </select>
+          </div>
+          <button class="btn primary" id="btnRun">▶ Jalankan Visualisasi</button>
+          <span class="stat-chip" id="chipStatus">Belum dijalankan</span>
+        </div>
+
+        <div class="race-grid">
+          <div class="card race-col" id="colBubble">
+            <div class="race-head">
+              <h3>Bubble Sort</h3><span class="win-crown" id="crownBubble">🏆</span><span class="fin-badge"
+                id="finBubble">selesai</span>
+            </div>
+            <div class="panel-title">Pseudokode</div>
+            <div class="code-scroll">
+              <div class="code" id="codeBoxBubble"></div>
+            </div>
+            <div class="stat-row">
+              <span class="stat-chip">Perbandingan: <b id="statCompBubble">0</b></span>
+              <span class="stat-chip">Tukar: <b id="statSwapBubble">0</b></span>
+            </div>
+            <div class="panel-title">Posisi Data</div>
+            <div class="slots" id="slotsBoxBubble"></div>
+          </div>
+
+          <div class="card race-col" id="colInsertion">
+            <div class="race-head">
+              <h3>Insertion Sort</h3><span class="win-crown" id="crownInsertion">🏆</span><span class="fin-badge"
+                id="finInsertion">selesai</span>
+            </div>
+            <div class="panel-title">Pseudokode</div>
+            <div class="code-scroll">
+              <div class="code" id="codeBoxInsertion"></div>
+            </div>
+            <div class="stat-row">
+              <span class="stat-chip">Perbandingan: <b id="statCompInsertion">0</b></span>
+              <span class="stat-chip">Geser: <b id="statSwapInsertion">0</b></span>
+            </div>
+            <div class="panel-title">Posisi Data</div>
+            <div class="slots" id="slotsBoxInsertion"></div>
+          </div>
+        </div>
+
+        <div class="card note-bar" id="noteBar">Tekan <b>Jalankan Visualisasi</b> untuk mulai membandingkan kedua
+          algoritma.</div>
+
+        <div class="card playback">
+          <button class="btn" id="btnPrev">⟵ Sebelumnya</button>
+          <button class="btn primary" id="btnPlay">▶ Putar</button>
+          <button class="btn" id="btnNext">Berikutnya ⟶</button>
+          <button class="btn ghost" id="btnReset">Ulang</button>
+          <span class="progress" id="progressEl">0 / 0</span>
+          <div class="spacer"></div>
+          <div class="speed"><span>Kecepatan</span><input type="range" id="speedInput" min="250" max="1600" step="50"
+              value="750"></div>
+        </div>
+
+        <div class="card winner-banner" id="winnerBanner"></div>
+
+        <div class="apply-row">
+          <button class="btn" id="btnApply" disabled>✓ Terapkan urutan ini ke Data Mahasiswa</button>
+          <span class="apply-note" id="applyNote"></span>
+        </div>
+      </section>
+
+      <!-- ===== VIEW 3: BANDINGKAN ===== -->
+      <section class="view" id="view-compare">
+        <div class="view-head">
+          <h2>Bandingkan Algoritma</h2>
+          <p>Perbedaan konsep Bubble Sort dan Insertion Sort, serta hitungan nyata dari data kelas saat ini — lengkap
+            dengan tanda mana yang lebih cepat.</p>
+        </div>
+
+        <div class="card compare-table-wrap">
+          <table class="compare">
+            <thead>
+              <tr>
+                <th>Aspek</th>
+                <th>Bubble Sort</th>
+                <th>Insertion Sort</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="label">Cara kerja</td>
+                <td>Membandingkan dua elemen bersebelahan berulang kali, menukar jika urutannya salah, sehingga elemen
+                  terbesar/terkecil "menggelembung" ke ujung.</td>
+                <td>Mengambil satu elemen sebagai kunci, lalu menyisipkannya ke posisi yang tepat di antara
+                  elemen-elemen yang sudah terurut sebelumnya.</td>
+              </tr>
+              <tr>
+                <td class="label">Kompleksitas terbaik</td>
+                <td>O(n) — data sudah terurut</td>
+                <td>O(n) — data sudah terurut</td>
+              </tr>
+              <tr>
+                <td class="label">Kompleksitas rata-rata</td>
+                <td>O(n²)</td>
+                <td>O(n²)</td>
+              </tr>
+              <tr>
+                <td class="label">Kompleksitas terburuk</td>
+                <td>O(n²)</td>
+                <td>O(n²)</td>
+              </tr>
+              <tr>
+                <td class="label">Ruang tambahan</td>
+                <td>O(1)</td>
+                <td>O(1)</td>
+              </tr>
+              <tr>
+                <td class="label">Stabil?</td>
+                <td>Ya</td>
+                <td>Ya</td>
+              </tr>
+              <tr>
+                <td class="label">Cocok untuk</td>
+                <td>Data kecil, tujuan pembelajaran konsep pertukaran</td>
+                <td>Data kecil hingga sedang, atau data yang hampir terurut</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card live-controls">
+          <div class="field"><label for="cmpKey">Urutkan berdasarkan</label>
+            <select id="cmpKey">
+              <option value="nilai">Nilai</option>
+              <option value="nama">Nama</option>
+              <option value="nim">NIM</option>
+            </select>
+          </div>
+          <div class="field"><label for="cmpOrder">Arah</label>
+            <select id="cmpOrder">
+              <option value="asc">Naik</option>
+              <option value="desc">Turun</option>
+            </select>
+          </div>
+          <button class="btn primary" id="btnCompareRun">Hitung dengan Data Saat Ini</button>
+        </div>
+
+        <div class="result-grid" id="resultGrid" style="display:none;">
+          <div class="card result-card" id="cardBubbleResult">
+            <h3>Bubble Sort <span class="win-tag" id="tagBubbleWin">Lebih cepat</span></h3>
+            <div class="bar-row"><span class="lbl">Perbandingan</span>
+              <div class="bar-track">
+                <div class="bar-fill" id="bBarComp" style="background:var(--gold)"></div>
+              </div><span class="num" id="bNumComp">0</span>
+            </div>
+            <div class="bar-row"><span class="lbl">Pertukaran</span>
+              <div class="bar-track">
+                <div class="bar-fill" id="bBarSwap" style="background:var(--red)"></div>
+              </div><span class="num" id="bNumSwap">0</span>
+            </div>
+            <div class="bar-row"><span class="lbl">Total operasi</span>
+              <div class="bar-track">
+                <div class="bar-fill" id="bBarTotal" style="background:var(--blue)"></div>
+              </div><span class="num" id="bNumTotal">0</span>
+            </div>
+          </div>
+          <div class="card result-card" id="cardInsertionResult">
+            <h3>Insertion Sort <span class="win-tag" id="tagInsertionWin">Lebih cepat</span></h3>
+            <div class="bar-row"><span class="lbl">Perbandingan</span>
+              <div class="bar-track">
+                <div class="bar-fill" id="iBarComp" style="background:var(--gold)"></div>
+              </div><span class="num" id="iNumComp">0</span>
+            </div>
+            <div class="bar-row"><span class="lbl">Geser</span>
+              <div class="bar-track">
+                <div class="bar-fill" id="iBarSwap" style="background:var(--red)"></div>
+              </div><span class="num" id="iNumSwap">0</span>
+            </div>
+            <div class="bar-row"><span class="lbl">Total operasi</span>
+              <div class="bar-track">
+                <div class="bar-fill" id="iBarTotal" style="background:var(--blue)"></div>
+              </div><span class="num" id="iNumTotal">0</span>
+            </div>
+          </div>
+        </div>
+        <div class="result-verdict" id="resultVerdict"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      /* ================= DATA MAHASISWA ================= */
+      var STORAGE_KEY = "sik-roster-v2";
+      var THEME_KEY = "sik-theme";
+
+      var DEFAULT_STUDENTS = [
+        { nim: "2401001", nama: "Rangga Saputra", nilai: 78 },
+        { nim: "2401002", nama: "Ayu Lestari", nilai: 92 },
+        { nim: "2401003", nama: "Budi Santoso", nilai: 65 },
+        { nim: "2401004", nama: "Citra Dewi Pratiwi", nilai: 88 },
+        { nim: "2401005", nama: "Dimas Prakoso", nilai: 71 },
+        { nim: "2401006", nama: "Elang Nugraha", nilai: 83 },
+        { nim: "2401007", nama: "Fitriani Handayani", nilai: 59 },
+        { nim: "2401008", nama: "Gilang Ramadhan", nilai: 95 },
+      ];
+
+      var state = { students: [], appliedSort: null };
+
+      function loadState() {
+        try {
+          var raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            if (parsed && Array.isArray(parsed.students)) {
+              state.students = parsed.students;
+              state.appliedSort = parsed.appliedSort || null;
+              return;
+            }
+          }
+        } catch (e) { /* penyimpanan tidak tersedia, pakai data bawaan */ }
+        state.students = DEFAULT_STUDENTS.slice();
+        state.appliedSort = null;
+      }
+      function saveState() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+        catch (e) { /* abaikan jika penyimpanan gagal */ }
+      }
+
+      var rosterBody = document.getElementById("rosterBody");
+      var rosterCount = document.getElementById("rosterCount");
+      var appliedTagWrap = document.getElementById("appliedTagWrap");
+
+      function renderRoster() {
+        rosterBody.innerHTML = "";
+        if (state.students.length === 0) {
+          var tr = document.createElement("tr");
+          tr.className = "empty-row";
+          tr.innerHTML = '<td colspan="5">Belum ada data mahasiswa. Tambahkan dari form di atas.</td>';
+          rosterBody.appendChild(tr);
+        } else {
+          state.students.forEach(function (s, idx) {
+            var tr = document.createElement("tr");
+            tr.innerHTML =
+              '<td>' + (idx + 1) + '</td>' +
+              '<td class="nim">' + escapeHtml(s.nim) + '</td>' +
+              '<td>' + escapeHtml(s.nama) + '</td>' +
+              '<td class="nilai">' + escapeHtml(String(s.nilai)) + '</td>' +
+              '<td><button class="del-btn" data-nim="' + escapeHtml(s.nim) + '">Hapus</button></td>';
+            rosterBody.appendChild(tr);
+          });
+        }
+        rosterCount.textContent = state.students.length + " mahasiswa";
+        appliedTagWrap.innerHTML = state.appliedSort
+          ? '<span class="applied-tag">Urutan diterapkan: ' + escapeHtml(state.appliedSort) + '</span>'
+          : "";
+        Array.prototype.forEach.call(rosterBody.querySelectorAll(".del-btn"), function (btn) {
+          btn.addEventListener("click", function () {
+            var nim = btn.getAttribute("data-nim");
+            state.students = state.students.filter(function (s) { return s.nim !== nim; });
+            state.appliedSort = null;
+            saveState(); renderRoster();
+          });
+        });
+      }
+
+      function escapeHtml(s) {
+        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+
+      var addForm = document.getElementById("addForm");
+      var formError = document.getElementById("formError");
+      addForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var nim = document.getElementById("inNim").value.trim();
+        var nama = document.getElementById("inNama").value.trim();
+        var nilaiRaw = document.getElementById("inNilai").value.trim();
+        formError.textContent = "";
+
+        if (!nim || !nama || nilaiRaw === "") {
+          formError.textContent = "NIM, nama, dan nilai wajib diisi."; return;
+        }
+        var nilai = Number(nilaiRaw);
+        if (isNaN(nilai) || nilai < 0 || nilai > 100) {
+          formError.textContent = "Nilai harus berupa angka 0–100."; return;
+        }
+        if (state.students.some(function (s) { return s.nim === nim; })) {
+          formError.textContent = "NIM " + nim + " sudah terdaftar."; return;
+        }
+        state.students.push({ nim: nim, nama: nama, nilai: nilai });
+        state.appliedSort = null;
+        saveState(); renderRoster();
+        addForm.reset();
+      });
+
+      /* ================= NAVIGASI ================= */
+      var navButtons = document.querySelectorAll(".cover nav button");
+      var views = { data: document.getElementById("view-data"), sort: document.getElementById("view-sort"), compare: document.getElementById("view-compare") };
+      navButtons.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          pause();
+          navButtons.forEach(function (b) { b.classList.remove("active"); });
+          btn.classList.add("active");
+          Object.keys(views).forEach(function (k) { views[k].classList.remove("active"); });
+          views[btn.getAttribute("data-view")].classList.add("active");
+        });
+      });
+
+      /* ================= LOGIKA PENGURUTAN ================= */
+      function cmp(a, b, key, order) {
+        var res;
+        if (key === "nama") res = a.nama.localeCompare(b.nama, "id");
+        else res = a[key] - b[key];
+        return order === "desc" ? -res : res;
+      }
+
+      var BUBBLE_CODE = [
+        "function bubbleSort(data, kunci, arah):",
+        "  n ← panjang(data)",
+        "  untuk i dari 0 sampai n-2:",
+        "    untuk j dari 0 sampai n-i-2:",
+        "      jika data[j] > data[j+1]:",
+        "        tukar(data[j], data[j+1])",
+        "    // posisi n-i-1 sudah terurut",
+        "  kembalikan data"
+      ];
+      var INSERTION_CODE = [
+        "function insertionSort(data, kunci, arah):",
+        "  n ← panjang(data)",
+        "  // data[0] dianggap sudah terurut",
+        "  untuk i dari 1 sampai n-1:",
+        "    kunci_baris ← data[i]",
+        "    j ← i - 1",
+        "    selama j ≥ 0 dan data[j] > kunci_baris:",
+        "      data[j+1] ← data[j]",
+        "      j ← j - 1",
+        "    data[j+1] ← kunci_baris",
+        "  kembalikan data"
+      ];
+
+      function bubbleSortSteps(dataArr, key, order) {
+        var arr = dataArr.slice(); var n = arr.length;
+        var comparisons = 0, swaps = 0, sortedIdx = [];
+        var steps = [];
+        function snap(extra) {
+          var s = {
+            array: arr.slice(), sorted: sortedIdx.slice(), comparisons: comparisons, swaps: swaps,
+            compare: [], swap: [], active: null, note: "", line: 0
+          };
+          Object.assign(s, extra);
+          steps.push(s);
+        }
+        snap({ line: 0, note: "Mulai — bandingkan pasangan elemen bersebelahan dari kiri ke kanan." });
+        for (var i = 0; i < n - 1; i++) {
+          for (var j = 0; j < n - i - 1; j++) {
+            comparisons++;
+            var willSwap = cmp(arr[j], arr[j + 1], key, order) > 0;
+            snap({
+              line: 4, compare: [j, j + 1],
+              note: "Bandingkan posisi " + j + " dengan posisi " + (j + 1) + "."
+            });
+            if (willSwap) {
+              var t = arr[j]; arr[j] = arr[j + 1]; arr[j + 1] = t; swaps++;
+              snap({ line: 5, swap: [j, j + 1], note: "Tukar posisi " + j + " dan " + (j + 1) + "." });
+            }
+          }
+          sortedIdx.push(n - 1 - i);
+          snap({ line: 6, sorted: sortedIdx.slice(), note: "Posisi " + (n - 1 - i) + " sudah pasti benar." });
+        }
+        sortedIdx = arr.map(function (_, idx) { return idx; });
+        snap({ line: 7, sorted: sortedIdx.slice(), note: "Selesai — seluruh data terurut." });
+        return { steps: steps, comparisons: comparisons, swaps: swaps, result: arr };
+      }
+
+      function insertionSortSteps(dataArr, key, order) {
+        var arr = dataArr.slice(); var n = arr.length;
+        var comparisons = 0, swaps = 0;
+        var steps = [];
+        function snap(sortedIdx, extra) {
+          var s = {
+            array: arr.slice(), sorted: sortedIdx, comparisons: comparisons, swaps: swaps,
+            compare: [], swap: [], active: null, note: "", line: 0
+          };
+          Object.assign(s, extra);
+          steps.push(s);
+        }
+        snap([0], { line: 2, note: "Elemen pertama dianggap sudah terurut." });
+        for (var i = 1; i < n; i++) {
+          var keyVal = arr[i]; var j = i - 1;
+          var sortedRange = [];
+          for (var k = 0; k < i; k++) sortedRange.push(k);
+          snap(sortedRange, { line: 4, active: i, note: "Ambil kunci dari posisi " + i + "." });
+          while (j >= 0) {
+            comparisons++;
+            var cond = cmp(arr[j], keyVal, key, order) > 0;
+            snap(sortedRange, { line: 6, active: i, compare: [j], note: "Bandingkan posisi " + j + " dengan kunci." });
+            if (!cond) break;
+            arr[j + 1] = arr[j]; swaps++;
+            snap(sortedRange, { line: 7, active: i, swap: [j + 1], note: "Geser data dari posisi " + j + " ke " + (j + 1) + "." });
+            j--;
+          }
+          arr[j + 1] = keyVal;
+          var newSorted = [];
+          for (var m = 0; m <= i; m++) newSorted.push(m);
+          snap(newSorted, { line: 9, swap: [j + 1], note: "Sisipkan kunci di posisi " + (j + 1) + "." });
+        }
+        var full = []; for (var p = 0; p < n; p++) full.push(p);
+        snap(full, { line: 10, note: "Selesai — seluruh data terurut." });
+        return { steps: steps, comparisons: comparisons, swaps: swaps, result: arr };
+      }
+
+      /* ================= PANEL VISUALISASI (RACE) ================= */
+      var selKey = document.getElementById("selKey");
+      var selOrder = document.getElementById("selOrder");
+      var btnRun = document.getElementById("btnRun");
+      var chipStatus = document.getElementById("chipStatus");
+      var noteBar = document.getElementById("noteBar");
+      var progressEl = document.getElementById("progressEl");
+      var btnPrev = document.getElementById("btnPrev");
+      var btnNext = document.getElementById("btnNext");
+      var btnPlay = document.getElementById("btnPlay");
+      var btnReset = document.getElementById("btnReset");
+      var speedInput = document.getElementById("speedInput");
+      var btnApply = document.getElementById("btnApply");
+      var applyNote = document.getElementById("applyNote");
+      var winnerBanner = document.getElementById("winnerBanner");
+
+      var cols = {
+        bubble: {
+          code: document.getElementById("codeBoxBubble"),
+          slotsBox: document.getElementById("slotsBoxBubble"),
+          colEl: document.getElementById("colBubble"),
+          finBadge: document.getElementById("finBubble"),
+          crown: document.getElementById("crownBubble"),
+          statComp: document.getElementById("statCompBubble"),
+          statSwap: document.getElementById("statSwapBubble"),
+          slotEls: [], run: null, label: "Bubble Sort"
+        },
+        insertion: {
+          code: document.getElementById("codeBoxInsertion"),
+          slotsBox: document.getElementById("slotsBoxInsertion"),
+          colEl: document.getElementById("colInsertion"),
+          finBadge: document.getElementById("finInsertion"),
+          crown: document.getElementById("crownInsertion"),
+          statComp: document.getElementById("statCompInsertion"),
+          statSwap: document.getElementById("statSwapInsertion"),
+          slotEls: [], run: null, label: "Insertion Sort"
+        }
+      };
+
+      var masterIndex = 0, maxLen = 0, playing = false, playTimer = null;
+      var lastResult = null, lastLabel = "";
+
+      function renderCode(col, lines) {
+        col.code.innerHTML = "";
+        lines.forEach(function (text, i) {
+          var row = document.createElement("div");
+          row.className = "line"; row.dataset.line = i;
+          row.innerHTML = '<span class="ln">' + (i + 1) + '</span><span>' + escapeHtml(text) + '</span>';
+          col.code.appendChild(row);
+        });
+      }
+      function highlightLine(col, idx) {
+        var rows = col.code.children;
+        for (var i = 0; i < rows.length; i++) { rows[i].classList.toggle("hl", i === idx); }
+        if (rows[idx]) rows[idx].scrollIntoView({ block: "nearest" });
+      }
+
+      var TAG_TEXT = { compare: "dibandingkan", swap: "geser/tukar", active: "kunci", sorted: "terurut" };
+
+      function ensureSlots(col, n) {
+        col.slotsBox.innerHTML = ""; col.slotEls = [];
+        for (var i = 0; i < n; i++) {
+          var row = document.createElement("div");
+          row.className = "slot-row";
+          row.innerHTML =
+            '<span class="pos">#' + i + '</span>' +
+            '<span class="nim"></span><span class="nama"></span><span class="nilai"></span>' +
+            '<span class="tag"></span>';
+          col.slotsBox.appendChild(row);
+          col.slotEls.push({
+            row: row,
+            nim: row.querySelector(".nim"),
+            nama: row.querySelector(".nama"),
+            nilai: row.querySelector(".nilai"),
+            tag: row.querySelector(".tag")
+          });
+        }
+      }
+
+      function renderColumnStep(col, step) {
+        for (var i = 0; i < step.array.length; i++) {
+          var stu = step.array[i]; var el = col.slotEls[i];
+          el.nim.textContent = stu.nim;
+          el.nama.textContent = stu.nama;
+          el.nilai.textContent = stu.nilai;
+          var st = "";
+          if (step.sorted.indexOf(i) !== -1) st = "sorted";
+          if (step.compare.indexOf(i) !== -1) st = "compare";
+          if (step.active === i) st = "active";
+          if (step.swap.indexOf(i) !== -1) st = "swap";
+          el.row.dataset.state = st;
+          el.tag.textContent = st ? TAG_TEXT[st] : "";
+        }
+        highlightLine(col, step.line);
+        col.statComp.textContent = step.comparisons;
+        col.statSwap.textContent = step.swaps;
+      }
+
+      function render() {
+        var stepB = cols.bubble.run.steps[Math.min(masterIndex, cols.bubble.run.steps.length - 1)];
+        var stepI = cols.insertion.run.steps[Math.min(masterIndex, cols.insertion.run.steps.length - 1)];
+        renderColumnStep(cols.bubble, stepB);
+        renderColumnStep(cols.insertion, stepI);
+
+        var bubbleDone = masterIndex >= cols.bubble.run.steps.length - 1;
+        var insertionDone = masterIndex >= cols.insertion.run.steps.length - 1;
+        cols.bubble.finBadge.classList.toggle("show", bubbleDone);
+        cols.insertion.finBadge.classList.toggle("show", insertionDone);
+        cols.bubble.finBadge.textContent = "selesai di langkah " + cols.bubble.run.steps.length;
+        cols.insertion.finBadge.textContent = "selesai di langkah " + cols.insertion.run.steps.length;
+
+        noteBar.innerHTML =
+          '<div><b>Bubble Sort:</b> ' + stepB.note + '</div>' +
+          '<div><b>Insertion Sort:</b> ' + stepI.note + '</div>';
+
+        progressEl.textContent = (masterIndex + 1) + " / " + maxLen;
+        btnPrev.disabled = masterIndex <= 0;
+        btnNext.disabled = masterIndex >= maxLen - 1;
+        btnApply.disabled = false;
+
+        var atEnd = masterIndex >= maxLen - 1;
+        cols.bubble.colEl.classList.remove("winner");
+        cols.insertion.colEl.classList.remove("winner");
+        cols.bubble.crown.classList.remove("show");
+        cols.insertion.crown.classList.remove("show");
+        if (atEnd) {
+          showWinnerBanner();
+        } else {
+          winnerBanner.classList.remove("show");
+        }
+      }
+
+      function showWinnerBanner() {
+        var opsB = cols.bubble.run.comparisons + cols.bubble.run.swaps;
+        var opsI = cols.insertion.run.comparisons + cols.insertion.run.swaps;
+        var stepsB = cols.bubble.run.steps.length;
+        var stepsI = cols.insertion.run.steps.length;
+        var html;
+        if (opsB === opsI) {
+          html = "⚖️ <b>Sama cepat</b> — Bubble Sort dan Insertion Sort sama-sama melakukan " + opsB + " operasi (perbandingan + tukar/geser) untuk data ini.";
+        } else {
+          var winnerCol = opsI < opsB ? cols.insertion : cols.bubble;
+          var loserCol = opsI < opsB ? cols.bubble : cols.insertion;
+          var opsWin = Math.min(opsB, opsI), opsLose = Math.max(opsB, opsI);
+          winnerCol.colEl.classList.add("winner");
+          winnerCol.crown.classList.add("show");
+          html = "🏆 <b>" + winnerCol.label + " lebih cepat</b> pada data ini — " + opsWin + " operasi, dibanding " +
+            loserCol.label + " yang butuh " + opsLose + " operasi (langkah animasi: Bubble " + stepsB + ", Insertion " + stepsI + ").";
+        }
+        winnerBanner.innerHTML = html;
+        winnerBanner.classList.add("show");
+      }
+
+      function goTo(idx) {
+        masterIndex = Math.max(0, Math.min(maxLen - 1, idx));
+        render();
+      }
+      function stepForward() {
+        if (masterIndex >= maxLen - 1) { pause(); return false; }
+        masterIndex++; render(); return true;
+      }
+      function stepBack() { if (masterIndex > 0) { masterIndex--; render(); } }
+      function tick() {
+        if (!playing) return;
+        var ok = stepForward();
+        if (!ok) return;
+        playTimer = setTimeout(tick, Number(speedInput.value));
+      }
+      function play() {
+        if (!cols.bubble.run) return;
+        if (masterIndex >= maxLen - 1) masterIndex = 0;
+        playing = true; btnPlay.textContent = "⏸ Jeda";
+        clearTimeout(playTimer);
+        playTimer = setTimeout(tick, Number(speedInput.value));
+      }
+      function pause() {
+        playing = false; btnPlay.textContent = "▶ Putar"; clearTimeout(playTimer);
+      }
+
+      function runVisualization() {
+        pause();
+        if (state.students.length < 2) {
+          chipStatus.textContent = "Butuh minimal 2 mahasiswa";
+          return;
+        }
+        var key = selKey.value, order = selOrder.value;
+        cols.bubble.run = bubbleSortSteps(state.students, key, order);
+        cols.insertion.run = insertionSortSteps(state.students, key, order);
+        maxLen = Math.max(cols.bubble.run.steps.length, cols.insertion.run.steps.length);
+
+        lastResult = cols.bubble.run.result;
+        var keyLabel = key === "nilai" ? "Nilai" : (key === "nama" ? "Nama" : "NIM");
+        var orderLabel = order === "asc" ? "naik" : "turun";
+        lastLabel = keyLabel + " " + orderLabel;
+
+        renderCode(cols.bubble, BUBBLE_CODE);
+        renderCode(cols.insertion, INSERTION_CODE);
+        ensureSlots(cols.bubble, state.students.length);
+        ensureSlots(cols.insertion, state.students.length);
+
+        chipStatus.textContent = "Bubble: " + cols.bubble.run.steps.length + " langkah · Insertion: " + cols.insertion.run.steps.length + " langkah";
+        applyNote.textContent = "";
+        goTo(0);
+      }
+
+      btnRun.addEventListener("click", runVisualization);
+      btnPlay.addEventListener("click", function () { playing ? pause() : play(); });
+      btnNext.addEventListener("click", function () { pause(); stepForward(); });
+      btnPrev.addEventListener("click", function () { pause(); stepBack(); });
+      btnReset.addEventListener("click", function () { pause(); if (cols.bubble.run) goTo(0); });
+
+      btnApply.addEventListener("click", function () {
+        if (!lastResult) return;
+        state.students = lastResult.map(function (s) { return { nim: s.nim, nama: s.nama, nilai: s.nilai }; });
+        state.appliedSort = lastLabel;
+        saveState(); renderRoster();
+        applyNote.textContent = "Urutan diterapkan ke Data Mahasiswa (" + lastLabel + ").";
+      });
+
+      /* ================= BANDINGKAN ================= */
+      var cmpKey = document.getElementById("cmpKey");
+      var cmpOrder = document.getElementById("cmpOrder");
+      var btnCompareRun = document.getElementById("btnCompareRun");
+      var resultGrid = document.getElementById("resultGrid");
+      var resultVerdict = document.getElementById("resultVerdict");
+      var cardBubbleResult = document.getElementById("cardBubbleResult");
+      var cardInsertionResult = document.getElementById("cardInsertionResult");
+      var tagBubbleWin = document.getElementById("tagBubbleWin");
+      var tagInsertionWin = document.getElementById("tagInsertionWin");
+
+      btnCompareRun.addEventListener("click", function () {
+        if (state.students.length < 2) {
+          resultVerdict.textContent = "Butuh minimal 2 mahasiswa untuk membandingkan.";
+          resultGrid.style.display = "none";
+          return;
+        }
+        var key = cmpKey.value, order = cmpOrder.value;
+        var rb = bubbleSortSteps(state.students, key, order);
+        var ri = insertionSortSteps(state.students, key, order);
+        var totalB = rb.comparisons + rb.swaps;
+        var totalI = ri.comparisons + ri.swaps;
+
+        resultGrid.style.display = "grid";
+        var maxVal = Math.max(rb.comparisons, rb.swaps, totalB, ri.comparisons, ri.swaps, totalI, 1);
+
+        document.getElementById("bNumComp").textContent = rb.comparisons;
+        document.getElementById("bNumSwap").textContent = rb.swaps;
+        document.getElementById("bNumTotal").textContent = totalB;
+        document.getElementById("iNumComp").textContent = ri.comparisons;
+        document.getElementById("iNumSwap").textContent = ri.swaps;
+        document.getElementById("iNumTotal").textContent = totalI;
+        document.getElementById("bBarComp").style.width = (rb.comparisons / maxVal * 100) + "%";
+        document.getElementById("bBarSwap").style.width = (rb.swaps / maxVal * 100) + "%";
+        document.getElementById("bBarTotal").style.width = (totalB / maxVal * 100) + "%";
+        document.getElementById("iBarComp").style.width = (ri.comparisons / maxVal * 100) + "%";
+        document.getElementById("iBarSwap").style.width = (ri.swaps / maxVal * 100) + "%";
+        document.getElementById("iBarTotal").style.width = (totalI / maxVal * 100) + "%";
+
+        cardBubbleResult.classList.remove("winner-card");
+        cardInsertionResult.classList.remove("winner-card");
+        tagBubbleWin.classList.remove("show");
+        tagInsertionWin.classList.remove("show");
+
+        if (totalB === totalI) {
+          resultVerdict.innerHTML = "⚖️ Untuk " + state.students.length + " data mahasiswa saat ini, <b>kedua algoritma sama cepat</b>: masing-masing melakukan " + totalB + " total operasi (perbandingan + tukar/geser).";
+        } else {
+          var winnerIsInsertion = totalI < totalB;
+          var winCard = winnerIsInsertion ? cardInsertionResult : cardBubbleResult;
+          var winTag = winnerIsInsertion ? tagInsertionWin : tagBubbleWin;
+          var winName = winnerIsInsertion ? "Insertion Sort" : "Bubble Sort";
+          var opsWin = Math.min(totalB, totalI), opsLose = Math.max(totalB, totalI);
+          winCard.classList.add("winner-card");
+          winTag.classList.add("show");
+          resultVerdict.innerHTML = "🏆 Untuk " + state.students.length + " data mahasiswa saat ini, <b>" + winName + " lebih cepat</b> — hanya " + opsWin + " total operasi, dibanding " + opsLose + " operasi pada algoritma satunya. Hasil ini bisa berbeda tergantung seberapa acak susunan data awal.";
+        }
+      });
+
+      /* ================= TEMA ================= */
+      var themeToggle = document.getElementById("themeToggle");
+      function systemPrefersDark() { return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches); }
+      function isDarkActive() {
+        var attr = document.documentElement.getAttribute("data-theme");
+        if (attr === "dark") return true;
+        if (attr === "light") return false;
+        return systemPrefersDark();
+      }
+      function loadThemePref() { try { return localStorage.getItem(THEME_KEY); } catch (e) { return null; } }
+      function saveThemePref(t) { try { localStorage.setItem(THEME_KEY, t); } catch (e) { } }
+      function applyTheme(theme) {
+        if (theme === "light" || theme === "dark") document.documentElement.setAttribute("data-theme", theme);
+        else document.documentElement.removeAttribute("data-theme");
+        themeToggle.textContent = isDarkActive() ? "☀️" : "🌙";
+      }
+      themeToggle.addEventListener("click", function () {
+        var next = isDarkActive() ? "light" : "dark";
+        applyTheme(next); saveThemePref(next);
+      });
+      applyTheme(loadThemePref());
+
+      /* ================= INIT ================= */
+      loadState();
+      renderRoster();
+      renderCode(cols.bubble, BUBBLE_CODE);
+      renderCode(cols.insertion, INSERTION_CODE);
+
+    })();
+  </script>
+</body>
+
+</html>
