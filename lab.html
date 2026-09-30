@@ -256,6 +256,64 @@
       line-height: 1.5;
     }
 
+    .custom-input-bar {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .custom-input-bar label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .custom-input-bar input[type="text"] {
+      flex: 1;
+      min-width: 200px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 7px 12px;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color .15s ease;
+    }
+
+    .custom-input-bar input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+
+    .custom-input-bar .btn-apply {
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--accent);
+      color: #12141C;
+      border: none;
+      padding: 7px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity .15s ease, transform .1s ease;
+    }
+
+    .custom-input-bar .btn-apply:hover {
+      opacity: 0.9;
+    }
+
+    .custom-input-bar .btn-apply:active {
+      transform: scale(.96);
+    }
+
     .panels {
       display: grid;
       grid-template-columns: 1.1fr 1fr;
@@ -991,6 +1049,11 @@
             <h2 id="algoTitle"></h2>
             <p id="algoDesc"></p>
           </div>
+          <div class="custom-input-bar">
+            <label for="customArrayInput">Input Custom Array:</label>
+            <input type="text" id="customArrayInput" placeholder="Contoh: 45, 12, 89, 33, 7, 60">
+            <button type="button" class="btn-apply" id="btnApplyCustom">Terapkan</button>
+          </div>
           <div class="panels">
             <section class="panel">
               <div class="panel-title code-panel-title">
@@ -1030,7 +1093,7 @@
         <div id="compareView" class="compare-view" style="display:none">
           <div class="algo-head">
             <h2>Perbandingan 7 Algoritma Sorting</h2>
-            <p>Kompleksitas waktu &amp; ruang, kestabilan, serta kelebihan (+) dan kekurangan (\u2212) tiap algoritma
+            <p>Kompleksitas waktu &amp; ruang, kestabilan, serta kelebihan (+) dan kekurangan (&minus;) tiap algoritma
               yang ada di sebelah kiri.</p>
           </div>
           <div class="compare-table-wrap">
@@ -1058,7 +1121,6 @@
   <script>
     (function () {
       "use strict";
-
       /* ---------- utils ---------- */
       function randomArray(n) {
         const arr = [];
@@ -1081,7 +1143,6 @@
          each: { name, desc, code:[lines], build(arr) -> steps[] }
       ========================================================== */
       const ALGORITHMS = {};
-
       /* ---- 1. Bubble Sort ---- */
       ALGORITHMS.bubble = {
         name: "Bubble Sort",
@@ -1149,7 +1210,6 @@
           return steps;
         }
       };
-
       /* ---- 2. Exchange Sort ---- */
       ALGORITHMS.exchange = {
         name: "Exchange Sort",
@@ -1201,7 +1261,6 @@
           return steps;
         }
       };
-
       /* ---- 3. Selection Sort ---- */
       ALGORITHMS.selection = {
         name: "Selection Sort",
@@ -1265,7 +1324,6 @@
           return steps;
         }
       };
-
       /* ---- 4. Insertion Sort ---- */
       ALGORITHMS.insertion = {
         name: "Insertion Sort",
@@ -1299,13 +1357,10 @@
         build(arr) {
           const a = cloneArr(arr), n = a.length, steps = [];
           const push = (o) => steps.push(Object.assign(baseStep(a, range(1), n), o));
-
           for (let i = 1; i < n; i++) {
             push({ line: 1, sorted: range(i), vars: { i }, note: `Mulai iterasi i = ${i}.` });
-
             const key = a[i];
             let hole = i;
-
             push({
               line: 2,
               sorted: range(i),
@@ -1313,7 +1368,6 @@
               vars: { i, key },
               note: `Angkat key = a[${i}] = ${key} ke memori sementara. Slot a[${i}] kini kosong.`
             });
-
             let j = i - 1;
             push({
               line: 3,
@@ -1322,7 +1376,6 @@
               vars: { i, j, key },
               note: `Inisialisasi penunjuk j = i - 1 = ${j}.`
             });
-
             while (j >= 0 && a[j] > key) {
               push({
                 line: 4,
@@ -1332,10 +1385,8 @@
                 vars: { j, key },
                 note: `Bandingkan: a[${j}] = ${a[j]} > key (${key}) \u2014 Benar, persiapkan pergeseran a[${j}] ke kanan.`
               });
-
               a[hole] = a[j];
               hole = j;
-
               push({
                 line: 5,
                 sorted: range(i),
@@ -1344,7 +1395,6 @@
                 vars: { j, key },
                 note: `Geser elemen ${a[j + 1]} dari indeks ${j} ke indeks ${j + 1}.`
               });
-
               j--;
               push({
                 line: 6,
@@ -1354,7 +1404,6 @@
                 note: `Mundurkan penunjuk j \u2192 j = ${j}.`
               });
             }
-
             if (j >= 0) {
               push({
                 line: 4,
@@ -1373,7 +1422,6 @@
                 note: `j = ${j} < 0 \u2014 Mencapai awal array. Posisi sisip di indeks 0.`
               });
             }
-
             a[j + 1] = key;
             push({
               line: 8,
@@ -1383,12 +1431,10 @@
               note: `Sisipkan nilai key (${key}) ke posisi target a[${j + 1}]. Subarray [0..${i}] kini terurut.`
             });
           }
-
           push({ line: 10, sorted: range(n), note: "Selesai! Seluruh array berhasil diurutkan secara presisi." });
           return steps;
         }
       };
-
       /* ---- 5. Shell Sort ---- */
       ALGORITHMS.shell = {
         name: "Shell Sort",
@@ -1449,7 +1495,6 @@
           return steps;
         }
       };
-
       /* ---- 6. Quick Sort ---- */
       ALGORITHMS.quick = {
         name: "Quick Sort",
@@ -1538,7 +1583,6 @@
           return steps;
         }
       };
-
       /* ---- 7. Radix Sort ---- */
       ALGORITHMS.radix = {
         name: "Radix Sort",
@@ -1613,9 +1657,7 @@
           return steps;
         }
       };
-
       const ORDER = ["bubble", "exchange", "selection", "insertion", "shell", "quick", "radix"];
-
       /* ---------- perbandingan algoritma ---------- */
       const COMPARE = {
         bubble: {
@@ -1720,13 +1762,11 @@
       /* Urutan tampilan: dari yang paling sering dipakai & paling mudah dipelajari,
          ke yang paling jarang (usageRank 1 = paling umum & mudah). */
       const COMPARE_ORDER = ORDER.slice().sort((a, b) => COMPARE[a].usageRank - COMPARE[b].usageRank);
-
       function tickHtml(bool) {
         return bool
           ? `<span class="tick yes">\u2713</span>`
           : `<span class="tick no">\u2717</span>`;
       }
-
       function speedIllusHtml(rank) {
         const pct = Math.max(30, 100 - (rank - 1) * 11.67);
         const tier = rank <= 2 ? "fast" : (rank <= 4 ? "mid" : "slow");
@@ -1736,7 +1776,6 @@
             <span class="label">#${rank}</span>
           </div>`;
       }
-
       function renderCompareTable() {
         const body = document.getElementById("compareTableBody");
         if (!body || body.children.length) return;
@@ -1755,7 +1794,6 @@
           body.appendChild(tr);
         });
       }
-
       function renderCompareGrid() {
         renderCompareTable();
         const grid = document.getElementById("compareGrid");
@@ -1818,6 +1856,8 @@
       const btnReset = document.getElementById("btnReset");
       const btnShuffle = document.getElementById("btnShuffle");
       const speedInput = document.getElementById("speed");
+      const customArrayInput = document.getElementById("customArrayInput");
+      const btnApplyCustom = document.getElementById("btnApplyCustom");
 
       /* ---------- build menu ---------- */
       ORDER.forEach((key, idx) => {
@@ -1911,11 +1951,9 @@
       function renderStep(step) {
         const maxVal = Math.max(...step.array, 1);
         const n = step.array.length;
-
         for (let i = 0; i < n; i++) {
           const v = step.array[i];
           const el = barEls[i];
-
           if (step.hole === i) {
             el.slot.classList.add("empty");
             el.value.textContent = "-";
@@ -1925,7 +1963,6 @@
             el.slot.classList.remove("empty");
             el.value.textContent = v;
             el.fill.style.height = Math.max(10, (v / maxVal) * 220) + "px";
-
             let state = "default";
             if (step.sorted.includes(i)) state = "sorted";
             if (step.compare.includes(i)) state = "compare";
@@ -1933,13 +1970,10 @@
             if (step.pivot === i) state = "pivot";
             if (step.swap && step.swap.includes(i)) state = "swap";
             if (step.shift && step.shift.includes(i)) state = "shift";
-
             el.fill.dataset.state = state;
           }
-
           const inRange = step.range ? (i >= step.range[0] && i <= step.range[1]) : true;
           el.slot.classList.toggle("dim", !inRange);
-
           if (step.badge && step.badge.index === i) {
             el.badge.textContent = step.badge.text;
             el.badge.classList.add("show");
@@ -1947,9 +1981,7 @@
             el.badge.classList.remove("show");
           }
         }
-
         highlightLine(step.line);
-
         varsRow.innerHTML = "";
         Object.keys(step.vars || {}).forEach(k => {
           const chip = document.createElement("span");
@@ -1957,7 +1989,6 @@
           chip.textContent = `${k} = ${step.vars[k]}`;
           varsRow.appendChild(chip);
         });
-
         noteBar.innerHTML = step.note || "";
         progressEl.textContent = `${stepIndex + 1} / ${steps.length}`;
         btnPrev.disabled = stepIndex <= 0;
@@ -2033,10 +2064,34 @@
         if (currentKey === "compare") return;
         pause();
         baseArray = randomArray(N);
+        customArrayInput.value = baseArray.join(", ");
         steps = ALGORITHMS[currentKey].build(baseArray);
         ensureBars(baseArray.length);
         goTo(0);
       }
+
+      /* ---------- custom array input logic ---------- */
+      function applyCustomArray() {
+        const val = customArrayInput.value.trim();
+        if (!val) return;
+        const parsed = val.split(/[\s,]+/).map(Number).filter(n => !isNaN(n) && n > 0);
+        if (parsed.length < 2) {
+          alert("Masukkan minimal 2 angka valid yang dipisahkan koma.");
+          return;
+        }
+        pause();
+        baseArray = parsed;
+        if (currentKey !== "compare") {
+          steps = ALGORITHMS[currentKey].build(baseArray);
+          ensureBars(baseArray.length);
+          goTo(0);
+        }
+      }
+
+      btnApplyCustom.addEventListener("click", applyCustomArray);
+      customArrayInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") applyCustomArray();
+      });
 
       /* ---------- wire controls ---------- */
       btnPlay.addEventListener("click", () => playing ? pause() : play());
@@ -2048,6 +2103,7 @@
       /* ---------- theme toggle ---------- */
       const themeToggle = document.getElementById("themeToggle");
       const THEME_KEY = "sorting-lab-theme";
+
       function systemPrefersDark() {
         return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
       }
@@ -2073,6 +2129,7 @@
         }
         themeToggle.textContent = isDarkActive() ? "\u2600\uFE0F" : "\uD83C\uDF19";
       }
+
       themeToggle.addEventListener("click", () => {
         const next = isDarkActive() ? "light" : "dark";
         applyTheme(next);
@@ -2081,6 +2138,7 @@
       applyTheme(loadThemePref());
 
       /* ---------- init ---------- */
+      customArrayInput.value = baseArray.join(", ");
       selectAlgo("bubble");
     })();
   </script>
