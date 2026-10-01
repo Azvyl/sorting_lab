@@ -4,384 +4,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Materi Sorting &amp; Studi Kasus Sorting</title>
+  <title>Terminal Algoritma Sorting</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
     rel="stylesheet">
-  <style>
-    :root {
-      box-sizing: border-box;
-      padding-top: env(safe-area-inset-top, 0px);
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      --bg: #121212;
-      --bg2: #1A1A1A;
-      --border: #2C2C2C;
-      --text: #ECECEC;
-      --muted: #9A9A9A;
-      --accent: #E0B15E;
-      --accent-text: #241a04;
-      --sans: 'Inter', system-ui, sans-serif;
-      --serif: 'Source Serif 4', Georgia, serif;
-    }
-
-    @media (prefers-color-scheme: light) {
-      :root:not([data-theme="dark"]) {
-        --bg: #FFFFFF;
-        --bg2: #F7F7F7;
-        --border: #E0E0E0;
-        --text: #000000;
-        --muted: #595959;
-        --accent: #B9862E;
-        --accent-text: #FBF6E7;
-      }
-    }
-
-    :root[data-theme="light"] {
-      --bg: #FFFFFF;
-      --bg2: #F7F7F7;
-      --border: #E0E0E0;
-      --text: #000000;
-      --muted: #595959;
-      --accent: #B9862E;
-      --accent-text: #FBF6E7;
-    }
-
-    :root[data-theme="dark"] {
-      --bg: #121212;
-      --bg2: #1A1A1A;
-      --border: #2C2C2C;
-      --text: #ECECEC;
-      --muted: #9A9A9A;
-      --accent: #E0B15E;
-      --accent-text: #241a04;
-    }
-
-    html {
-      height: 100%;
-      scroll-padding-top: env(safe-area-inset-top, 0px);
-      -webkit-text-size-adjust: 100%;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--sans);
-      -webkit-font-smoothing: antialiased;
-      display: flex;
-      flex-direction: column;
-    }
-
-    header.shell-top {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex-wrap: wrap;
-      padding: 14px 18px;
-      padding-top: calc(14px + env(safe-area-inset-top, 0px));
-      border-bottom: 1px solid var(--border);
-      background: var(--bg2);
-      flex: none;
-    }
-
-    header.shell-top .title {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      margin-right: auto;
-      min-width: 0;
-    }
-
-    header.shell-top .title h1 {
-      margin: 0;
-      font-family: var(--serif);
-      font-size: 18px;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    header.shell-top .title p {
-      margin: 0;
-      font-size: 11.5px;
-      color: var(--muted);
-    }
-
-    .tabs {
-      display: flex;
-      gap: 6px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      padding: 3px;
-      flex: none;
-    }
-
-    .tabs button {
-      font-family: var(--sans);
-      font-weight: 600;
-      font-size: 13px;
-      color: var(--muted);
-      background: transparent;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      transition: background .15s ease, color .15s ease;
-      white-space: nowrap;
-    }
-
-    .tabs button:hover {
-      color: var(--text);
-    }
-
-    .tabs button.active {
-      background: var(--accent);
-      color: var(--accent-text);
-    }
-
-    .tabs button .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: currentColor;
-      opacity: .55;
-      flex: none;
-    }
-
-    .theme-btn {
-      flex: none;
-      width: 36px;
-      height: 36px;
-      border-radius: 9px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      color: var(--text);
-      font-size: 15px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background .15s ease, transform .1s ease;
-    }
-
-    .theme-btn:hover {
-      background: var(--border);
-    }
-
-    .theme-btn:active {
-      transform: scale(.92);
-    }
-
-    main.shell-body {
-      flex: 1;
-      min-height: 0;
-      position: relative;
-    }
-
-    .frame-wrap {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transition: opacity .15s ease;
-    }
-
-    .frame-wrap.active {
-      opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
-    }
-
-    .frame-wrap iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
-      background: var(--bg2);
-    }
-
-    .loading {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 10px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .loading .spin {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: 2.5px solid var(--border);
-      border-top-color: var(--accent);
-      animation: spin .8s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    @media (max-width:640px) {
-      header.shell-top {
-        padding: 12px;
-      }
-
-      header.shell-top .title h1 {
-        font-size: 15px;
-      }
-
-      .tabs button {
-        padding: 7px 10px;
-        font-size: 12.3px;
-      }
-
-      .tabs button span.label-long {
-        display: none;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/shell.css">
 </head>
 
 <body>
   <header class="shell-top">
     <div class="title">
-      <h1>Materi Sorting &amp; Studi Kasus Sorting</h1>
-      <p>Satu tema, dua ruang belajar algoritma pengurutan</p>
+      <h1><span style="color:var(--accent)">⬢</span> MATERI SORTING & STUDI KASUS SORTING</h1>
+      <p>SATU TEMA, DUA RUANG BELAJAR ALGORITMA PENGURUTAN</p>
     </div>
     <div class="tabs" role="tablist">
       <button type="button" class="active" data-target="pane-lab" role="tab" aria-selected="true">
-        <span class="dot"></span><span class="label-long">1 &middot; </span>Materi Sorting
+        <span class="dot"></span><span class="label-long">01 &middot; </span>MATERI SORTING
       </button>
       <button type="button" data-target="pane-sik" role="tab" aria-selected="false">
-        <span class="dot"></span><span class="label-long">2 &middot; </span>Studi Kasus Sorting
+        <span class="dot"></span><span class="label-long">02 &middot; </span>STUDI KASUS SORTING
       </button>
     </div>
-    <button class="theme-btn" id="shellTheme" title="Ganti tema" aria-label="Ganti tema">☀️</button>
+    <button class="theme-btn" id="shellTheme" title="Ganti tema" aria-label="Ganti tema">🌙</button>
   </header>
   <main class="shell-body">
     <div class="frame-wrap active" id="pane-lab">
       <div class="loading" id="loading-lab">
-        <div class="spin"></div>Memuat Materi Sorting...
+        <div class="spin"></div>INITIALIZING DATA MATRIX...
       </div>
-      <iframe id="frame-lab" src="lab.html" title="Materi Sorting - Data Structure"></iframe>
+      <iframe id="frame-lab" src="lab.html" title="Materi Sorting"></iframe>
     </div>
     <div class="frame-wrap" id="pane-sik">
       <div class="loading" id="loading-sik">
-        <div class="spin"></div>Memuat Studi Kasus Sorting...
+        <div class="spin"></div>LOADING CLASS DATA TERMINAL...
       </div>
-      <iframe id="frame-sik" src="sik.html" title="Studi Kasus Sorting - Sistem Informasi Kelas"></iframe>
+      <iframe id="frame-sik" src="sik.html" title="Studi Kasus Sorting"></iframe>
     </div>
   </main>
-  <script>
-    (function () {
-      "use strict";
-      var SIK_THEME_KEY = "sik-theme";
-      var LAB_THEME_KEY = "sorting-lab-theme";
-      var SHELL_THEME_KEY = "shell-theme";
-
-      function systemPrefersDark() { return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); }
-      function isDarkActive() {
-        var attr = document.documentElement.getAttribute('data-theme');
-        if (attr === 'dark') return true;
-        if (attr === 'light') return false;
-        return systemPrefersDark();
-      }
-      function loadPref(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
-      function savePref(key, v) { try { localStorage.setItem(key, v); } catch (e) { } }
-
-      var desiredTheme = loadPref(SHELL_THEME_KEY);
-      var effectiveTheme = desiredTheme || (systemPrefersDark() ? 'dark' : 'light');
-      savePref(SIK_THEME_KEY, effectiveTheme);
-      savePref(LAB_THEME_KEY, effectiveTheme);
-
-      var frames = {};
-
-      function initFrame(key, frameId, loadingId) {
-        var frame = document.getElementById(frameId);
-        var loading = document.getElementById(loadingId);
-        frames[key] = { frame: frame, loading: loading, ready: false };
-
-        frame.addEventListener('load', function () {
-          if (loading) loading.style.display = 'none';
-          frames[key].ready = true;
-          hideInnerThemeButton(frame);
-        });
-      }
-
-      function hideInnerThemeButton(frame) {
-        try {
-          var btn = frame.contentDocument && frame.contentDocument.getElementById('themeToggle');
-          if (btn) btn.style.display = 'none';
-        } catch (e) { /* fallback jika cross-origin */ }
-      }
-
-      initFrame('lab', 'frame-lab', 'loading-lab');
-      initFrame('sik', 'frame-sik', 'loading-sik');
-
-      /* ---------- tab switching ---------- */
-      var tabs = document.querySelectorAll('.tabs button');
-      var panes = document.querySelectorAll('.frame-wrap');
-      tabs.forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          tabs.forEach(function (b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
-          panes.forEach(function (p) { p.classList.remove('active'); });
-          btn.classList.add('active'); btn.setAttribute('aria-selected', 'true');
-          document.getElementById(btn.getAttribute('data-target')).classList.add('active');
-        });
-      });
-
-      /* ---------- single, synced theme toggle for the whole page ---------- */
-      var themeBtn = document.getElementById('shellTheme');
-      function applyTheme(t) {
-        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
-        else document.documentElement.removeAttribute('data-theme');
-        themeBtn.textContent = isDarkActive() ? '☀️' : '🌙';
-      }
-
-      function pushThemeToFrame(key, storageKey, theme) {
-        var entry = frames[key];
-        if (!entry || !entry.ready) return;
-        try {
-          var doc = entry.frame.contentDocument;
-          if (doc) doc.documentElement.setAttribute('data-theme', theme);
-          var win = entry.frame.contentWindow;
-          if (win && win.localStorage) win.localStorage.setItem(storageKey, theme);
-        } catch (e) { /* fallback jika cross-origin */ }
-      }
-
-      themeBtn.addEventListener('click', function () {
-        var next = isDarkActive() ? 'light' : 'dark';
-        applyTheme(next);
-        savePref(SHELL_THEME_KEY, next);
-        savePref(SIK_THEME_KEY, next);
-        savePref(LAB_THEME_KEY, next);
-        pushThemeToFrame('sik', SIK_THEME_KEY, next);
-        pushThemeToFrame('lab', LAB_THEME_KEY, next);
-      });
-
-      applyTheme(desiredTheme);
-    })();
-  </script>
+  <script src="js/shell.js"></script>
 </body>
 
 </html>

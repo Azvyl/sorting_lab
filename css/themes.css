@@ -1,0 +1,149 @@
+/* =========================================================
+   BLUE ARCHIVE THEME DEFINITIONS
+   ========================================================= */
+
+:root {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+
+  --sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --serif: 'Source Serif 4', Georgia, serif;
+  --mono: 'IBM Plex Mono', 'Courier New', monospace;
+}
+
+/* ---------------------------------------------------------
+   LIGHT MODE
+   Schale / Arona Sky Blue, Pearl White & Halo Pink
+   --------------------------------------------------------- */
+:root,
+:root[data-theme="light"] {
+  --bg-img: url('../assets/images/BG_AronaRoom.jpg');
+  --bg: #EEF4F9;
+  --bg2: #FFFFFF;
+  --panel: rgba(255, 255, 255, 0.78);
+  --panel-2: rgba(232, 241, 250, 0.85);
+  --panel-solid: #FFFFFF;
+  --border: rgba(43, 130, 201, 0.32);
+  --border-glow: rgba(43, 130, 201, 0.6);
+
+  --text: #0A1932;
+  --muted: #486581;
+  --accent: #2B82C9;
+  --accent-soft: rgba(43, 130, 201, 0.14);
+  --accent-text: #FFFFFF;
+
+  /* Visualizer State Colors */
+  --amber: #D97706;  /* Compare / Warning */
+  --coral: #E05275;  /* Swap / Arona Halo Pink */
+  --sage: #10B981;   /* Sorted / Success */
+  --violet: #8B5CF6; /* Pivot / Special */
+
+  /* SIK Specific Paper/Cover Theme */
+  --cover: rgba(27, 73, 101, 0.88);
+  --cover-2: rgba(11, 37, 69, 0.95);
+  --cover-text: #EEF4F8;
+  --cover-text-dim: #90B4CE;
+  --paper: rgba(255, 255, 255, 0.82);
+  --paper-2: rgba(244, 247, 250, 0.9);
+  --paper-line: rgba(43, 130, 201, 0.2);
+  --ink: #0A1932;
+  --red: #E05275;
+  --red-soft: rgba(224, 82, 117, 0.15);
+  --blue: #2B82C9;
+  --blue-soft: rgba(43, 130, 201, 0.15);
+  --gold: #D97706;
+  --gold-soft: rgba(217, 119, 6, 0.18);
+  --ok: #10B981;
+  --ok-soft: rgba(16, 185, 129, 0.18);
+}
+
+/* ---------------------------------------------------------
+   DARK MODE
+   Plana Midnight, Cold Ice Cyan, Violet & Crimson Pink
+   --------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-img: url('../assets/images/BG_AronaRoom_Night.jpg');
+    --bg: #030813;
+    --bg2: #061024;
+    --panel: rgba(8, 22, 45, 0.72);
+    --panel-2: rgba(15, 38, 75, 0.65);
+    --panel-solid: #0A1A33;
+    --border: rgba(0, 210, 255, 0.35);
+    --border-glow: rgba(0, 210, 255, 0.65);
+
+    --text: #E0F7FF;
+    --muted: #7E9DB8;
+    --accent: #00F0FF;
+    --accent-soft: rgba(0, 240, 255, 0.16);
+    --accent-text: #020C1B;
+
+    --amber: #FFAA00;
+    --coral: #FF0055;
+    --sage: #00FFAA;
+    --violet: #D000FF;
+
+    --cover: rgba(8, 18, 36, 0.88);
+    --cover-2: rgba(3, 8, 18, 0.95);
+    --cover-text: #E0F7FF;
+    --cover-text-dim: #7E9DB8;
+    --paper: rgba(6, 16, 36, 0.75);
+    --paper-2: rgba(12, 28, 58, 0.68);
+    --paper-line: rgba(0, 210, 255, 0.2);
+    --ink: #E0F7FF;
+    --red: #FF0055;
+    --red-soft: rgba(255, 0, 85, 0.2);
+    --blue: #00F0FF;
+    --blue-soft: rgba(0, 240, 255, 0.2);
+    --gold: #FFAA00;
+    --gold-soft: rgba(255, 170, 0, 0.2);
+    --ok: #00FFAA;
+    --ok-soft: rgba(0, 255, 170, 0.2);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg-img: url('../assets/images/BG_AronaRoom_Night.jpg');
+  --bg: #030813;
+  --bg2: #061024;
+  --panel: rgba(8, 22, 45, 0.72);
+  --panel-2: rgba(15, 38, 75, 0.65);
+  --panel-solid: #0A1A33;
+  --border: rgba(0, 210, 255, 0.35);
+  --border-glow: rgba(0, 210, 255, 0.65);
+
+  --text: #E0F7FF;
+  --muted: #7E9DB8;
+  --accent: #00F0FF;
+  --accent-soft: rgba(0, 240, 255, 0.16);
+  --accent-text: #020C1B;
+
+  --amber: #FFAA00;
+  --coral: #FF0055;
+  --sage: #00FFAA;
+  --violet: #D000FF;
+
+  --cover: rgba(8, 18, 36, 0.88);
+  --cover-2: rgba(3, 8, 18, 0.95);
+  --cover-text: #E0F7FF;
+  --cover-text-dim: #7E9DB8;
+  --paper: rgba(6, 16, 36, 0.75);
+  --paper-2: rgba(12, 28, 58, 0.68);
+  --paper-line: rgba(0, 210, 255, 0.2);
+  --ink: #E0F7FF;
+  --red: #FF0055;
+  --red-soft: rgba(255, 0, 85, 0.2);
+  --blue: #00F0FF;
+  --blue-soft: rgba(0, 240, 255, 0.2);
+  --gold: #FFAA00;
+  --gold-soft: rgba(255, 170, 0, 0.2);
+  --ok: #00FFAA;
+  --ok-soft: rgba(0, 255, 170, 0.2);
+}
+
+/* Global Background Setup */
+body {
+  background: var(--bg-img) no-repeat center center fixed, var(--bg);
+  background-size: cover;
+}

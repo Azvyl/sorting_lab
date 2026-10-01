@@ -1,0 +1,256 @@
+html {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+  -webkit-text-size-adjust: 100%;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Background layer locked to 100vw so scrollbars never shift the background image */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--bg-img) no-repeat center center, var(--bg);
+  background-size: cover;
+  pointer-events: none;
+  z-index: -1;
+}
+
+header.shell-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 12px 24px;
+  padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  flex: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  position: relative;
+  z-index: 10;
+}
+
+/* Pola Garis Aksen Header */
+header.shell-top::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
+header.shell-top .title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-right: auto;
+  min-width: 0;
+}
+
+header.shell-top .title h1 {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+  text-shadow: 0 0 10px var(--accent-soft);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+header.shell-top .title p {
+  margin: 0;
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+/* Tabs Berbentuk Cut Corner */
+.tabs {
+  display: flex;
+  gap: 8px;
+  background: transparent;
+  padding: 0;
+  flex: none;
+}
+
+.tabs button {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  padding: 8px 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  transition: all 0.2s ease;
+}
+
+.tabs button:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 10px var(--accent-soft);
+}
+
+.tabs button.active {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
+  box-shadow: 0 0 15px var(--accent-soft);
+  font-weight: 700;
+}
+
+.tabs button .dot {
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  flex: none;
+}
+
+.theme-btn {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.theme-btn:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 10px var(--accent-soft);
+}
+
+.theme-btn:active {
+  transform: scale(0.92);
+}
+
+main.shell-body {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.frame-wrap {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.frame-wrap.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.frame-wrap iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+  background: transparent;
+}
+
+.loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.loading .spin {
+  width: 32px;
+  height: 32px;
+  border: 2px solid transparent;
+  border-top-color: var(--accent);
+  border-bottom-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  header.shell-top {
+    padding: 10px 14px;
+    gap: 10px;
+  }
+
+  header.shell-top .title h1 {
+    font-size: 13.5px;
+  }
+
+  header.shell-top .title p {
+    font-size: 10px;
+  }
+
+  .tabs button {
+    padding: 7px 10px;
+    font-size: 11px;
+  }
+
+  .tabs button span.label-long {
+    display: none;
+  }
+}
