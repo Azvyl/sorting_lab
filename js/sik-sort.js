@@ -9,8 +9,10 @@
   var rosterBody = document.getElementById("rosterBody");
   var rosterCount = document.getElementById("rosterCount");
   var appliedTagWrap = document.getElementById("appliedTagWrap");
+  var btnResetDefault = document.getElementById("btnResetDefault");
 
   function renderRoster() {
+    if (!rosterBody) return;
     rosterBody.innerHTML = "";
     if (state.students.length === 0) {
       var tr = document.createElement("tr");
@@ -29,10 +31,12 @@
         rosterBody.appendChild(tr);
       });
     }
-    rosterCount.textContent = state.students.length + " mahasiswa";
-    appliedTagWrap.innerHTML = state.appliedSort
-      ? '<span class="applied-tag">Urutan diterapkan: ' + escapeHtml(state.appliedSort) + '</span>'
-      : "";
+    if (rosterCount) rosterCount.textContent = state.students.length + " mahasiswa";
+    if (appliedTagWrap) {
+      appliedTagWrap.innerHTML = state.appliedSort
+        ? '<span class="applied-tag">Urutan diterapkan: ' + escapeHtml(state.appliedSort) + '</span>'
+        : "";
+    }
 
     Array.prototype.forEach.call(rosterBody.querySelectorAll(".del-btn"), function (btn) {
       btn.addEventListener("click", function () {
@@ -45,33 +49,44 @@
     });
   }
 
+  if (btnResetDefault) {
+    btnResetDefault.addEventListener("click", function () {
+      if (confirm("Reset daftar mahasiswa ke data karakter Blue Archive bawaan?")) {
+        SIKData.resetState();
+        renderRoster();
+      }
+    });
+  }
+
   var addForm = document.getElementById("addForm");
   var formError = document.getElementById("formError");
 
-  addForm.addEventListener("submit", function (e) {
-    e.preventDefault();
-    var nim = document.getElementById("inNim").value.trim();
-    var nama = document.getElementById("inNama").value.trim();
-    var nilaiRaw = document.getElementById("inNilai").value.trim();
-    formError.textContent = "";
+  if (addForm) {
+    addForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var nim = document.getElementById("inNim").value.trim();
+      var nama = document.getElementById("inNama").value.trim();
+      var nilaiRaw = document.getElementById("inNilai").value.trim();
+      if (formError) formError.textContent = "";
 
-    if (!nim || !nama || nilaiRaw === "") {
-      formError.textContent = "NIM, nama, dan nilai wajib diisi."; return;
-    }
-    var nilai = Number(nilaiRaw);
-    if (isNaN(nilai) || nilai < 0 || nilai > 100) {
-      formError.textContent = "Nilai harus berupa angka 0 - 100."; return;
-    }
-    if (state.students.some(function (s) { return s.nim === nim; })) {
-      formError.textContent = "NIM " + nim + " sudah terdaftar."; return;
-    }
+      if (!nim || !nama || nilaiRaw === "") {
+        if (formError) formError.textContent = "NIM, nama, dan nilai wajib diisi."; return;
+      }
+      var nilai = Number(nilaiRaw);
+      if (isNaN(nilai) || nilai < 0 || nilai > 100) {
+        if (formError) formError.textContent = "Nilai harus berupa angka 0 - 100."; return;
+      }
+      if (state.students.some(function (s) { return s.nim === nim; })) {
+        if (formError) formError.textContent = "NIM " + nim + " sudah terdaftar."; return;
+      }
 
-    state.students.push({ nim: nim, nama: nama, nilai: nilai });
-    state.appliedSort = null;
-    SIKData.saveState();
-    renderRoster();
-    addForm.reset();
-  });
+      state.students.push({ nim: nim, nama: nama, nilai: nilai });
+      state.appliedSort = null;
+      SIKData.saveState();
+      renderRoster();
+      addForm.reset();
+    });
+  }
 
   /* ================= NAVIGASI VIEW ================= */
   var navButtons = document.querySelectorAll(".cover nav button");
@@ -86,12 +101,15 @@
       pause();
       navButtons.forEach(function (b) { b.classList.remove("active"); });
       btn.classList.add("active");
-      Object.keys(views).forEach(function (k) { views[k].classList.remove("active"); });
-      views[btn.getAttribute("data-view")].classList.add("active");
+      Object.keys(views).forEach(function (k) {
+        if (views[k]) views[k].classList.remove("active");
+      });
+      var targetView = views[btn.getAttribute("data-view")];
+      if (targetView) targetView.classList.add("active");
     });
   });
 
-  /* ================= LOGIKA PENGURUTAN ================= */
+  /* ================= LOGIKA PENGURUTAN (STEP GENERATORS) ================= */
   function cmp(a, b, key, order) {
     var res;
     if (key === "nama") res = a.nama.localeCompare(b.nama, "id");
@@ -99,31 +117,7 @@
     return order === "desc" ? -res : res;
   }
 
-  var BUBBLE_CODE = [
-    "function bubbleSort(data, kunci, arah):",
-    "  n ← panjang(data)",
-    "  untuk i dari 0 sampai n-2:",
-    "    untuk j dari 0 sampai n-i-2:",
-    "      jika data[j] > data[j+1]:",
-    "        tukar(data[j], data[j+1])",
-    "    // posisi n-i-1 sudah terurut",
-    "  kembalikan data"
-  ];
-
-  var INSERTION_CODE = [
-    "function insertionSort(data, kunci, arah):",
-    "  n ← panjang(data)",
-    "  // data[0] dianggap sudah terurut",
-    "  untuk i dari 1 sampai n-1:",
-    "    kunci_baris ← data[i]",
-    "    j ← i - 1",
-    "    selama j ≥ 0 dan data[j] > kunci_baris:",
-    "      data[j+1] ← data[j]",
-    "      j ← j - 1",
-    "    data[j+1] ← kunci_baris",
-    "  kembalikan data"
-  ];
-
+  /* 1. BUBBLE SORT */
   function bubbleSortSteps(dataArr, key, order) {
     var arr = dataArr.slice(); var n = arr.length;
     var comparisons = 0, swaps = 0, sortedIdx = [];
@@ -138,14 +132,14 @@
       steps.push(s);
     }
 
-    snap({ line: 0, note: "Mulai — bandingkan pasangan elemen bersebelahan dari kiri ke kanan." });
+    snap({ line: 0, note: "Mulai Bubble Sort — bandingkan pasangan elemen bersebelahan dari kiri ke kanan." });
     for (var i = 0; i < n - 1; i++) {
       for (var j = 0; j < n - i - 1; j++) {
         comparisons++;
         var willSwap = cmp(arr[j], arr[j + 1], key, order) > 0;
         snap({
           line: 4, compare: [j, j + 1],
-          note: "Bandingkan posisi " + j + " dengan posisi " + (j + 1) + "."
+          note: "Bandingkan posisi " + j + " (" + escapeHtml(arr[j][key]) + ") dengan posisi " + (j + 1) + " (" + escapeHtml(arr[j + 1][key]) + ")."
         });
         if (willSwap) {
           var t = arr[j]; arr[j] = arr[j + 1]; arr[j + 1] = t; swaps++;
@@ -153,13 +147,14 @@
         }
       }
       sortedIdx.push(n - 1 - i);
-      snap({ line: 6, sorted: sortedIdx.slice(), note: "Posisi " + (n - 1 - i) + " sudah pasti benar." });
+      snap({ line: 6, sorted: sortedIdx.slice(), note: "Posisi " + (n - 1 - i) + " sudah pasti berada di tempat akhir." });
     }
     sortedIdx = arr.map(function (_, idx) { return idx; });
     snap({ line: 7, sorted: sortedIdx.slice(), note: "Selesai — seluruh data terurut." });
     return { steps: steps, comparisons: comparisons, swaps: swaps, result: arr };
   }
 
+  /* 2. INSERTION SORT */
   function insertionSortSteps(dataArr, key, order) {
     var arr = dataArr.slice(); var n = arr.length;
     var comparisons = 0, swaps = 0;
@@ -167,23 +162,23 @@
 
     function snap(sortedIdx, extra) {
       var s = {
-        array: arr.slice(), sorted: sortedIdx, comparisons: comparisons, swaps: swaps,
+        array: arr.slice(), sorted: sortedIdx.slice(), comparisons: comparisons, swaps: swaps,
         compare: [], swap: [], active: null, note: "", line: 0
       };
       Object.assign(s, extra);
       steps.push(s);
     }
 
-    snap([0], { line: 2, note: "Elemen pertama dianggap sudah terurut." });
+    snap([0], { line: 2, note: "Elemen pertama dianggap sudah berada di bagian terurut." });
     for (var i = 1; i < n; i++) {
       var keyVal = arr[i]; var j = i - 1;
       var sortedRange = [];
       for (var k = 0; k < i; k++) sortedRange.push(k);
-      snap(sortedRange, { line: 4, active: i, note: "Ambil kunci dari posisi " + i + "." });
+      snap(sortedRange, { line: 4, active: i, note: "Ambil kunci dari posisi " + i + " (" + escapeHtml(keyVal[key]) + ")." });
       while (j >= 0) {
         comparisons++;
         var cond = cmp(arr[j], keyVal, key, order) > 0;
-        snap(sortedRange, { line: 6, active: i, compare: [j], note: "Bandingkan posisi " + j + " dengan kunci." });
+        snap(sortedRange, { line: 6, active: i, compare: [j], note: "Bandingkan posisi " + j + " (" + escapeHtml(arr[j][key]) + ") dengan kunci." });
         if (!cond) break;
         arr[j + 1] = arr[j]; swaps++;
         snap(sortedRange, { line: 7, active: i, swap: [j + 1], note: "Geser data dari posisi " + j + " ke " + (j + 1) + "." });
@@ -199,9 +194,169 @@
     return { steps: steps, comparisons: comparisons, swaps: swaps, result: arr };
   }
 
+  /* 3. SELECTION SORT */
+  function selectionSortSteps(dataArr, key, order) {
+    var arr = dataArr.slice(); var n = arr.length;
+    var comparisons = 0, swaps = 0, sortedIdx = [];
+    var steps = [];
+
+    function snap(extra) {
+      var s = {
+        array: arr.slice(), sorted: sortedIdx.slice(), comparisons: comparisons, swaps: swaps,
+        compare: [], swap: [], active: null, note: "", line: 0
+      };
+      Object.assign(s, extra);
+      steps.push(s);
+    }
+
+    snap({ line: 0, note: "Mulai Selection Sort — cari elemen terekstrem untuk ditempatkan ke posisi awal." });
+    for (var i = 0; i < n - 1; i++) {
+      var minIdx = i;
+      snap({ line: 2, active: i, note: "Mulai i = " + i + ". Anggap sementara posisi " + i + " adalah minimum." });
+      for (var j = i + 1; j < n; j++) {
+        comparisons++;
+        var isBetter = cmp(arr[j], arr[minIdx], key, order) < 0;
+        snap({
+          line: 4, active: minIdx, compare: [j, minIdx],
+          note: "Bandingkan posisi " + j + " (" + escapeHtml(arr[j][key]) + ") dengan minimum sementara di posisi " + minIdx + " (" + escapeHtml(arr[minIdx][key]) + ")."
+        });
+        if (isBetter) {
+          minIdx = j;
+          snap({ line: 5, active: minIdx, note: "Ditemukan nilai lebih kecil di posisi " + minIdx + "." });
+        }
+      }
+      if (minIdx !== i) {
+        var t = arr[i]; arr[i] = arr[minIdx]; arr[minIdx] = t; swaps++;
+        snap({ line: 7, swap: [i, minIdx], note: "Tukar posisi " + i + " dengan minimum di posisi " + minIdx + "." });
+      }
+      sortedIdx.push(i);
+      snap({ line: 8, sorted: sortedIdx.slice(), note: "Posisi " + i + " sudah pasti benar dan terurut." });
+    }
+    sortedIdx = arr.map(function (_, idx) { return idx; });
+    snap({ line: 9, sorted: sortedIdx.slice(), note: "Selesai — seluruh data terurut." });
+    return { steps: steps, comparisons: comparisons, swaps: swaps, result: arr };
+  }
+
+  /* 4. SHELL SORT */
+  function shellSortSteps(dataArr, key, order) {
+    var arr = dataArr.slice(); var n = arr.length;
+    var comparisons = 0, swaps = 0, sortedIdx = [];
+    var steps = [];
+
+    function snap(extra) {
+      var s = {
+        array: arr.slice(), sorted: sortedIdx.slice(), comparisons: comparisons, swaps: swaps,
+        compare: [], swap: [], active: null, note: "", line: 0
+      };
+      Object.assign(s, extra);
+      steps.push(s);
+    }
+
+    snap({ line: 0, note: "Mulai Shell Sort — pengurutan berbasis interval gap bertahap." });
+    for (var gap = Math.floor(n / 2); gap > 0; gap = Math.floor(gap / 2)) {
+      snap({ line: 2, note: "Gunakan gap interval = " + gap + "." });
+      for (var i = gap; i < n; i++) {
+        var temp = arr[i];
+        var j = i;
+        snap({ line: 4, active: i, note: "Ambil data posisi " + i + " (" + escapeHtml(temp[key]) + ") untuk perbandingan gap." });
+        while (j >= gap) {
+          comparisons++;
+          var cond = cmp(arr[j - gap], temp, key, order) > 0;
+          snap({ line: 6, active: i, compare: [j - gap, j], note: "Bandingkan jarak gap " + gap + ": posisi " + (j - gap) + " dengan " + j + "." });
+          if (!cond) break;
+          arr[j] = arr[j - gap]; swaps++;
+          snap({ line: 7, swap: [j, j - gap], note: "Geser posisi " + (j - gap) + " ke " + j + "." });
+          j -= gap;
+        }
+        arr[j] = temp;
+        snap({ line: 9, swap: [j], note: "Tempatkan data ke posisi " + j + "." });
+      }
+    }
+    sortedIdx = arr.map(function (_, idx) { return idx; });
+    snap({ line: 10, sorted: sortedIdx.slice(), note: "Selesai — seluruh data terurut." });
+    return { steps: steps, comparisons: comparisons, swaps: swaps, result: arr };
+  }
+
+  /* ALGORITHM REGISTRY */
+  var ALGO_DEFS = {
+    bubble: {
+      name: "Bubble Sort",
+      swapLabel: "Tukar",
+      code: [
+        "function bubbleSort(data, kunci, arah):",
+        "  n ← panjang(data)",
+        "  untuk i dari 0 sampai n-2:",
+        "    untuk j dari 0 sampai n-i-2:",
+        "      jika data[j] > data[j+1]:",
+        "        tukar(data[j], data[j+1])",
+        "    // posisi n-i-1 sudah terurut",
+        "  kembalikan data"
+      ],
+      run: bubbleSortSteps
+    },
+    insertion: {
+      name: "Insertion Sort",
+      swapLabel: "Geser",
+      code: [
+        "function insertionSort(data, kunci, arah):",
+        "  n ← panjang(data)",
+        "  // data[0] dianggap sudah terurut",
+        "  untuk i dari 1 sampai n-1:",
+        "    kunci_baris ← data[i]",
+        "    j ← i - 1",
+        "    selama j ≥ 0 dan data[j] > kunci_baris:",
+        "      data[j+1] ← data[j]",
+        "      j ← j - 1",
+        "    data[j+1] ← kunci_baris",
+        "  kembalikan data"
+      ],
+      run: insertionSortSteps
+    },
+    selection: {
+      name: "Selection Sort",
+      swapLabel: "Tukar",
+      code: [
+        "function selectionSort(data, kunci, arah):",
+        "  n ← panjang(data)",
+        "  untuk i dari 0 sampai n-2:",
+        "    idx_min ← i",
+        "    untuk j dari i+1 sampai n-1:",
+        "      jika data[j] < data[idx_min]:",
+        "        idx_min ← j",
+        "    jika idx_min ≠ i:",
+        "      tukar(data[i], data[idx_min])",
+        "    // posisi i sudah terurut",
+        "  kembalikan data"
+      ],
+      run: selectionSortSteps
+    },
+    shell: {
+      name: "Shell Sort",
+      swapLabel: "Geser",
+      code: [
+        "function shellSort(data, kunci, arah):",
+        "  n ← panjang(data)",
+        "  gap ← ⌊n / 2⌋",
+        "  selama gap > 0:",
+        "    untuk i dari gap sampai n-1:",
+        "      temp ← data[i]",
+        "      j ← i",
+        "      selama j ≥ gap dan data[j-gap] > temp:",
+        "        data[j] ← data[j-gap]",
+        "        j ← j - gap",
+        "      data[j] ← temp",
+        "    gap ← ⌊gap / 2⌋",
+        "  kembalikan data"
+      ],
+      run: shellSortSteps
+    }
+  };
+
   /* ================= PANEL VISUALISASI RACE ================= */
   var selKey = document.getElementById("selKey");
   var selOrder = document.getElementById("selOrder");
+  var selAlgo1 = document.getElementById("selAlgo1");
+  var selAlgo2 = document.getElementById("selAlgo2");
   var btnRun = document.getElementById("btnRun");
   var chipStatus = document.getElementById("chipStatus");
   var noteBar = document.getElementById("noteBar");
@@ -215,33 +370,46 @@
   var applyNote = document.getElementById("applyNote");
   var winnerBanner = document.getElementById("winnerBanner");
 
-  var cols = {
-    bubble: {
-      code: document.getElementById("codeBoxBubble"),
-      slotsBox: document.getElementById("slotsBoxBubble"),
-      colEl: document.getElementById("colBubble"),
-      finBadge: document.getElementById("finBubble"),
-      crown: document.getElementById("crownBubble"),
-      statComp: document.getElementById("statCompBubble"),
-      statSwap: document.getElementById("statSwapBubble"),
-      slotEls: [], run: null, label: "Bubble Sort"
-    },
-    insertion: {
-      code: document.getElementById("codeBoxInsertion"),
-      slotsBox: document.getElementById("slotsBoxInsertion"),
-      colEl: document.getElementById("colInsertion"),
-      finBadge: document.getElementById("finInsertion"),
-      crown: document.getElementById("crownInsertion"),
-      statComp: document.getElementById("statCompInsertion"),
-      statSwap: document.getElementById("statSwapInsertion"),
-      slotEls: [], run: null, label: "Insertion Sort"
-    }
+  var col1 = {
+    key: "bubble",
+    nameEl: document.getElementById("nameCol1"),
+    code: document.getElementById("codeBox1"),
+    slotsBox: document.getElementById("slotsBox1"),
+    colEl: document.getElementById("col1"),
+    finBadge: document.getElementById("fin1"),
+    crown: document.getElementById("crown1"),
+    statComp: document.getElementById("statComp1"),
+    statSwap: document.getElementById("statSwap1"),
+    lblSwap: document.getElementById("lblSwap1"),
+    slotEls: [], run: null, label: "Bubble Sort"
+  };
+
+  var col2 = {
+    key: "insertion",
+    nameEl: document.getElementById("nameCol2"),
+    code: document.getElementById("codeBox2"),
+    slotsBox: document.getElementById("slotsBox2"),
+    colEl: document.getElementById("col2"),
+    finBadge: document.getElementById("fin2"),
+    crown: document.getElementById("crown2"),
+    statComp: document.getElementById("statComp2"),
+    statSwap: document.getElementById("statSwap2"),
+    lblSwap: document.getElementById("lblSwap2"),
+    slotEls: [], run: null, label: "Insertion Sort"
   };
 
   var masterIndex = 0, maxLen = 0, playing = false, playTimer = null;
   var lastResult = null, lastLabel = "";
 
+  function getSikDelay() {
+    if (!speedInput) return 400;
+    var min = Number(speedInput.min) || 200;
+    var max = Number(speedInput.max) || 1500;
+    return (max + min) - Number(speedInput.value);
+  }
+
   function renderCode(col, lines) {
+    if (!col.code) return;
     col.code.innerHTML = "";
     lines.forEach(function (text, i) {
       var row = document.createElement("div");
@@ -251,22 +419,26 @@
     });
   }
 
-  function highlightLine(col, idx) {
+  function highlightLine(col, lineIdx) {
+    if (!col.code) return;
     var rows = col.code.children;
-    for (var i = 0; i < rows.length; i++) { rows[i].classList.toggle("hl", i === idx); }
-    if (rows[idx]) rows[idx].scrollIntoView({ block: "nearest" });
+    for (var i = 0; i < rows.length; i++) {
+      rows[i].classList.toggle("hl", i === lineIdx);
+    }
   }
 
-  var TAG_TEXT = { compare: "dibandingkan", swap: "geser/tukar", active: "kunci", sorted: "terurut" };
-
-  function ensureSlots(col, n) {
-    col.slotsBox.innerHTML = ""; col.slotEls = [];
-    for (var i = 0; i < n; i++) {
+  function ensureSlots(col, count) {
+    if (!col.slotsBox) return;
+    col.slotsBox.innerHTML = "";
+    col.slotEls = [];
+    for (var i = 0; i < count; i++) {
       var row = document.createElement("div");
       row.className = "slot-row";
       row.innerHTML =
-        '<span class="pos">#' + i + '</span>' +
-        '<span class="nim"></span><span class="nama"></span><span class="nilai"></span>' +
+        '<span class="pos">' + (i + 1) + '</span>' +
+        '<span class="nim"></span>' +
+        '<span class="nama"></span>' +
+        '<span class="nilai"></span>' +
         '<span class="tag"></span>';
       col.slotsBox.appendChild(row);
       col.slotEls.push({
@@ -279,217 +451,327 @@
     }
   }
 
-  function renderColumnStep(col, step) {
-    for (var i = 0; i < step.array.length; i++) {
-      var stu = step.array[i]; var el = col.slotEls[i];
-      el.nim.textContent = stu.nim;
-      el.nama.textContent = stu.nama;
-      el.nilai.textContent = stu.nilai;
-      var st = "";
-      if (step.sorted.indexOf(i) !== -1) st = "sorted";
-      if (step.compare.indexOf(i) !== -1) st = "compare";
-      if (step.active === i) st = "active";
-      if (step.swap.indexOf(i) !== -1) st = "swap";
-      el.row.dataset.state = st;
-      el.tag.textContent = st ? TAG_TEXT[st] : "";
+  function renderStep(col, step) {
+    if (!step || !col.slotEls.length) return;
+    var n = step.array.length;
+    for (var i = 0; i < n; i++) {
+      var s = step.array[i];
+      var el = col.slotEls[i];
+      if (!el) continue;
+      el.nim.textContent = s.nim;
+      el.nama.textContent = s.nama;
+      el.nilai.textContent = s.nilai;
+
+      var stateAttr = "";
+      var tagText = "";
+      if (step.sorted && step.sorted.indexOf(i) !== -1) {
+        stateAttr = "sorted"; tagText = "OK";
+      }
+      if (step.compare && step.compare.indexOf(i) !== -1) {
+        stateAttr = "compare"; tagText = "CMP";
+      }
+      if (step.swap && step.swap.indexOf(i) !== -1) {
+        stateAttr = "swap"; tagText = col.key === "insertion" || col.key === "shell" ? "SHIFT" : "SWAP";
+      }
+      if (step.active === i) {
+        stateAttr = "active"; tagText = "KEY";
+      }
+      if (stateAttr) el.row.setAttribute("data-state", stateAttr);
+      else el.row.removeAttribute("data-state");
+      el.tag.textContent = tagText;
     }
     highlightLine(col, step.line);
-    col.statComp.textContent = step.comparisons;
-    col.statSwap.textContent = step.swaps;
+    if (col.statComp) col.statComp.textContent = step.comparisons;
+    if (col.statSwap) col.statSwap.textContent = step.swaps;
   }
 
-  function render() {
-    var stepB = cols.bubble.run.steps[Math.min(masterIndex, cols.bubble.run.steps.length - 1)];
-    var stepI = cols.insertion.run.steps[Math.min(masterIndex, cols.insertion.run.steps.length - 1)];
-    renderColumnStep(cols.bubble, stepB);
-    renderColumnStep(cols.insertion, stepI);
+  function updateWinnerUI() {
+    if (!col1.run || !col2.run) return;
+    var done1 = masterIndex >= col1.run.steps.length - 1;
+    var done2 = masterIndex >= col2.run.steps.length - 1;
 
-    var bubbleDone = masterIndex >= cols.bubble.run.steps.length - 1;
-    var insertionDone = masterIndex >= cols.insertion.run.steps.length - 1;
+    if (col1.finBadge) col1.finBadge.classList.toggle("show", done1);
+    if (col2.finBadge) col2.finBadge.classList.toggle("show", done2);
 
-    cols.bubble.finBadge.classList.toggle("show", bubbleDone);
-    cols.insertion.finBadge.classList.toggle("show", insertionDone);
-    cols.bubble.finBadge.textContent = "selesai di langkah " + cols.bubble.run.steps.length;
-    cols.insertion.finBadge.textContent = "selesai di langkah " + cols.insertion.run.steps.length;
-
-    noteBar.innerHTML =
-      '<div><b>Bubble Sort:</b> ' + stepB.note + '</div>' +
-      '<div><b>Insertion Sort:</b> ' + stepI.note + '</div>';
-
-    progressEl.textContent = (masterIndex + 1) + " / " + maxLen;
-    btnPrev.disabled = masterIndex <= 0;
-    btnNext.disabled = masterIndex >= maxLen - 1;
-    btnApply.disabled = false;
-
-    var atEnd = masterIndex >= maxLen - 1;
-    cols.bubble.colEl.classList.remove("winner");
-    cols.insertion.colEl.classList.remove("winner");
-    cols.bubble.crown.classList.remove("show");
-    cols.insertion.crown.classList.remove("show");
-
-    if (atEnd) {
-      showWinnerBanner();
+    var fullyDone = masterIndex >= maxLen - 1;
+    if (fullyDone) {
+      var ops1 = col1.run.comparisons + col1.run.swaps;
+      var ops2 = col2.run.comparisons + col2.run.swaps;
+      if (ops1 < ops2) {
+        if (col1.crown) col1.crown.classList.add("show");
+        if (col1.colEl) col1.colEl.classList.add("winner");
+        if (winnerBanner) {
+          winnerBanner.innerHTML = "🏆 <b>" + escapeHtml(col1.label) + " MENANG!</b> Selesai dalam " + col1.run.steps.length + " langkah (" + ops1 + " total operasi), lebih hemat daripada " + escapeHtml(col2.label) + " (" + ops2 + " operasi).";
+        }
+      } else if (ops2 < ops1) {
+        if (col2.crown) col2.crown.classList.add("show");
+        if (col2.colEl) col2.colEl.classList.add("winner");
+        if (winnerBanner) {
+          winnerBanner.innerHTML = "🏆 <b>" + escapeHtml(col2.label) + " MENANG!</b> Selesai dalam " + col2.run.steps.length + " langkah (" + ops2 + " total operasi), lebih hemat daripada " + escapeHtml(col1.label) + " (" + ops1 + " operasi).";
+        }
+      } else {
+        if (winnerBanner) {
+          winnerBanner.innerHTML = "🏁 <b>HASIL IMBANG!</b> Kedua algoritma selesai dengan efisiensi yang sama (" + ops1 + " total operasi).";
+        }
+      }
+      if (winnerBanner) winnerBanner.classList.add("show");
+      if (btnApply) btnApply.disabled = false;
     } else {
-      winnerBanner.classList.remove("show");
+      if (col1.crown) col1.crown.classList.remove("show");
+      if (col2.crown) col2.crown.classList.remove("show");
+      if (col1.colEl) col1.colEl.classList.remove("winner");
+      if (col2.colEl) col2.colEl.classList.remove("winner");
+      if (winnerBanner) winnerBanner.classList.remove("show");
+      if (btnApply) btnApply.disabled = true;
     }
-  }
-
-  function showWinnerBanner() {
-    var opsB = cols.bubble.run.comparisons + cols.bubble.run.swaps;
-    var opsI = cols.insertion.run.comparisons + cols.insertion.run.swaps;
-    var stepsB = cols.bubble.run.steps.length;
-    var stepsI = cols.insertion.run.steps.length;
-    var html;
-
-    if (opsB === opsI) {
-      html = "🏁 <b>Sama cepat</b> — Bubble Sort dan Insertion Sort sama-sama melakukan " + opsB + " operasi (perbandingan + tukar/geser) untuk data ini.";
-    } else {
-      var winnerCol = opsI < opsB ? cols.insertion : cols.bubble;
-      var loserCol = opsI < opsB ? cols.bubble : cols.insertion;
-      var opsWin = Math.min(opsB, opsI), opsLose = Math.max(opsB, opsI);
-      winnerCol.colEl.classList.add("winner");
-      winnerCol.crown.classList.add("show");
-      html = "🏆 <b>" + winnerCol.label + " lebih cepat</b> pada data ini — " + opsWin + " operasi, dibanding " +
-        loserCol.label + " yang butuh " + opsLose + " operasi (langkah animasi: Bubble " + stepsB + ", Insertion " + stepsI + ").";
-    }
-    winnerBanner.innerHTML = html;
-    winnerBanner.classList.add("show");
   }
 
   function goTo(idx) {
+    if (!col1.run || !col2.run) return;
     masterIndex = Math.max(0, Math.min(maxLen - 1, idx));
-    render();
+    var s1 = col1.run.steps[Math.min(masterIndex, col1.run.steps.length - 1)];
+    var s2 = col2.run.steps[Math.min(masterIndex, col2.run.steps.length - 1)];
+    renderStep(col1, s1);
+    renderStep(col2, s2);
+
+    if (noteBar) {
+      noteBar.innerHTML =
+        "<div><b>" + escapeHtml(col1.label) + ":</b> " + (s1 ? s1.note : "") + "</div>" +
+        "<div><b>" + escapeHtml(col2.label) + ":</b> " + (s2 ? s2.note : "") + "</div>";
+    }
+    if (progressEl) progressEl.textContent = (masterIndex + 1) + " / " + maxLen;
+    if (btnPrev) btnPrev.disabled = masterIndex <= 0;
+    if (btnNext) btnNext.disabled = masterIndex >= maxLen - 1;
+    updateWinnerUI();
   }
 
   function stepForward() {
     if (masterIndex >= maxLen - 1) { pause(); return false; }
-    masterIndex++; render(); return true;
+    masterIndex++;
+    goTo(masterIndex);
+    return true;
   }
 
-  function stepBack() { if (masterIndex > 0) { masterIndex--; render(); } }
+  function stepBack() {
+    if (masterIndex <= 0) return;
+    masterIndex--;
+    goTo(masterIndex);
+  }
 
   function tick() {
     if (!playing) return;
     var ok = stepForward();
     if (!ok) return;
-    playTimer = setTimeout(tick, Number(speedInput.value));
+    playTimer = setTimeout(tick, getSikDelay());
   }
 
   function play() {
-    if (!cols.bubble.run) return;
     if (masterIndex >= maxLen - 1) masterIndex = 0;
-    playing = true; btnPlay.textContent = "⏸ Jeda";
+    playing = true;
+    if (btnPlay) btnPlay.textContent = "⏸ JEDA";
     clearTimeout(playTimer);
-    playTimer = setTimeout(tick, Number(speedInput.value));
+    playTimer = setTimeout(tick, getSikDelay());
   }
 
   function pause() {
-    playing = false; btnPlay.textContent = "▶ Putar"; clearTimeout(playTimer);
+    playing = false;
+    if (btnPlay) btnPlay.textContent = "▶ PUTAR";
+    clearTimeout(playTimer);
+  }
+
+  function setupCol(col, algoKey, nameEl, lblSwap) {
+    var def = ALGO_DEFS[algoKey] || ALGO_DEFS.bubble;
+    col.key = algoKey;
+    col.label = def.name;
+    if (nameEl) nameEl.textContent = def.name;
+    if (lblSwap) lblSwap.textContent = def.swapLabel;
+    renderCode(col, def.code);
   }
 
   function runVisualization() {
     pause();
     if (state.students.length < 2) {
-      chipStatus.textContent = "Butuh minimal 2 mahasiswa";
+      if (chipStatus) chipStatus.textContent = "Butuh minimal 2 mahasiswa";
       return;
     }
     var key = selKey.value, order = selOrder.value;
-    cols.bubble.run = bubbleSortSteps(state.students, key, order);
-    cols.insertion.run = insertionSortSteps(state.students, key, order);
-    maxLen = Math.max(cols.bubble.run.steps.length, cols.insertion.run.steps.length);
-    lastResult = cols.bubble.run.result;
+    var a1 = selAlgo1 ? selAlgo1.value : "bubble";
+    var a2 = selAlgo2 ? selAlgo2.value : "insertion";
+
+    setupCol(col1, a1, col1.nameEl, col1.lblSwap);
+    setupCol(col2, a2, col2.nameEl, col2.lblSwap);
+
+    col1.run = ALGO_DEFS[a1].run(state.students, key, order);
+    col2.run = ALGO_DEFS[a2].run(state.students, key, order);
+
+    maxLen = Math.max(col1.run.steps.length, col2.run.steps.length);
+    lastResult = col1.run.result;
+
     var keyLabel = key === "nilai" ? "Nilai" : (key === "nama" ? "Nama" : "NIM");
     var orderLabel = order === "asc" ? "naik" : "turun";
     lastLabel = keyLabel + " " + orderLabel;
 
-    renderCode(cols.bubble, BUBBLE_CODE);
-    renderCode(cols.insertion, INSERTION_CODE);
-    ensureSlots(cols.bubble, state.students.length);
-    ensureSlots(cols.insertion, state.students.length);
-    chipStatus.textContent = "Bubble: " + cols.bubble.run.steps.length + " langkah • Insertion: " + cols.insertion.run.steps.length + " langkah";
-    applyNote.textContent = "";
+    ensureSlots(col1, state.students.length);
+    ensureSlots(col2, state.students.length);
+
+    if (chipStatus) {
+      chipStatus.textContent = col1.label + ": " + col1.run.steps.length + " langkah • " + col2.label + ": " + col2.run.steps.length + " langkah";
+    }
+    if (applyNote) applyNote.textContent = "";
     goTo(0);
   }
 
-  btnRun.addEventListener("click", runVisualization);
-  btnPlay.addEventListener("click", function () { playing ? pause() : play(); });
-  btnNext.addEventListener("click", function () { pause(); stepForward(); });
-  btnPrev.addEventListener("click", function () { pause(); stepBack(); });
-  btnReset.addEventListener("click", function () { pause(); if (cols.bubble.run) goTo(0); });
-  btnApply.addEventListener("click", function () {
-    if (!lastResult) return;
-    state.students = lastResult.map(function (s) { return { nim: s.nim, nama: s.nama, nilai: s.nilai }; });
-    state.appliedSort = lastLabel;
-    SIKData.saveState();
-    renderRoster();
-    applyNote.textContent = "Urutan diterapkan ke Data Mahasiswa (" + lastLabel + ").";
-  });
+  if (btnRun) btnRun.addEventListener("click", runVisualization);
+  if (btnPlay) btnPlay.addEventListener("click", function () { playing ? pause() : play(); });
+  if (btnNext) btnNext.addEventListener("click", function () { pause(); stepForward(); });
+  if (btnPrev) btnPrev.addEventListener("click", function () { pause(); stepBack(); });
+  if (btnReset) btnReset.addEventListener("click", function () { pause(); if (col1.run) goTo(0); });
+  if (speedInput) {
+    speedInput.addEventListener("input", function () {
+      if (playing) {
+        clearTimeout(playTimer);
+        playTimer = setTimeout(tick, getSikDelay());
+      }
+    });
+  }
 
-  /* ================= VIEW BANDINGKAN ================= */
+  if (btnApply) {
+    btnApply.addEventListener("click", function () {
+      if (!lastResult) return;
+      state.students = lastResult.map(function (s) { return { nim: s.nim, nama: s.nama, nilai: s.nilai }; });
+      state.appliedSort = lastLabel;
+      SIKData.saveState();
+      renderRoster();
+      if (applyNote) applyNote.textContent = "Urutan berhasil diterapkan ke Data Mahasiswa (" + lastLabel + ").";
+    });
+  }
+
+  /* ================= VIEW BANDINGKAN (4 ALGORITMA) ================= */
   var cmpKey = document.getElementById("cmpKey");
   var cmpOrder = document.getElementById("cmpOrder");
   var btnCompareRun = document.getElementById("btnCompareRun");
   var resultGrid = document.getElementById("resultGrid");
   var resultVerdict = document.getElementById("resultVerdict");
-  var cardBubbleResult = document.getElementById("cardBubbleResult");
-  var cardInsertionResult = document.getElementById("cardInsertionResult");
-  var tagBubbleWin = document.getElementById("tagBubbleWin");
-  var tagInsertionWin = document.getElementById("tagInsertionWin");
 
-  btnCompareRun.addEventListener("click", function () {
-    if (state.students.length < 2) {
-      resultVerdict.textContent = "Butuh minimal 2 mahasiswa untuk membandingkan.";
-      resultGrid.style.display = "none";
-      return;
+  var compareCards = {
+    bubble: {
+      card: document.getElementById("cardBubbleResult"),
+      tag: document.getElementById("tagBubbleWin"),
+      barComp: document.getElementById("bBarComp"),
+      barSwap: document.getElementById("bBarSwap"),
+      barTotal: document.getElementById("bBarTotal"),
+      numComp: document.getElementById("bNumComp"),
+      numSwap: document.getElementById("bNumSwap"),
+      numTotal: document.getElementById("bNumTotal"),
+      name: "Bubble Sort"
+    },
+    insertion: {
+      card: document.getElementById("cardInsertionResult"),
+      tag: document.getElementById("tagInsertionWin"),
+      barComp: document.getElementById("iBarComp"),
+      barSwap: document.getElementById("iBarSwap"),
+      barTotal: document.getElementById("iBarTotal"),
+      numComp: document.getElementById("iNumComp"),
+      numSwap: document.getElementById("iNumSwap"),
+      numTotal: document.getElementById("iNumTotal"),
+      name: "Insertion Sort"
+    },
+    selection: {
+      card: document.getElementById("cardSelectionResult"),
+      tag: document.getElementById("tagSelectionWin"),
+      barComp: document.getElementById("sBarComp"),
+      barSwap: document.getElementById("sBarSwap"),
+      barTotal: document.getElementById("sBarTotal"),
+      numComp: document.getElementById("sNumComp"),
+      numSwap: document.getElementById("sNumSwap"),
+      numTotal: document.getElementById("sNumTotal"),
+      name: "Selection Sort"
+    },
+    shell: {
+      card: document.getElementById("cardShellResult"),
+      tag: document.getElementById("tagShellWin"),
+      barComp: document.getElementById("shBarComp"),
+      barSwap: document.getElementById("shBarSwap"),
+      barTotal: document.getElementById("shBarTotal"),
+      numComp: document.getElementById("shNumComp"),
+      numSwap: document.getElementById("shNumSwap"),
+      numTotal: document.getElementById("shNumTotal"),
+      name: "Shell Sort"
     }
-    var key = cmpKey.value, order = cmpOrder.value;
-    var rb = bubbleSortSteps(state.students, key, order);
-    var ri = insertionSortSteps(state.students, key, order);
-    var totalB = rb.comparisons + rb.swaps;
-    var totalI = ri.comparisons + ri.swaps;
+  };
 
-    resultGrid.style.display = "grid";
-    var maxVal = Math.max(rb.comparisons, rb.swaps, totalB, ri.comparisons, ri.swaps, totalI, 1);
+  if (btnCompareRun) {
+    btnCompareRun.addEventListener("click", function () {
+      if (state.students.length < 2) {
+        if (resultVerdict) resultVerdict.textContent = "Butuh minimal 2 data mahasiswa untuk menjalankan perbandingan.";
+        if (resultGrid) resultGrid.style.display = "none";
+        return;
+      }
+      var key = cmpKey.value, order = cmpOrder.value;
 
-    document.getElementById("bNumComp").textContent = rb.comparisons;
-    document.getElementById("bNumSwap").textContent = rb.swaps;
-    document.getElementById("bNumTotal").textContent = totalB;
-    document.getElementById("iNumComp").textContent = ri.comparisons;
-    document.getElementById("iNumSwap").textContent = ri.swaps;
-    document.getElementById("iNumTotal").textContent = totalI;
+      var res = {
+        bubble: bubbleSortSteps(state.students, key, order),
+        insertion: insertionSortSteps(state.students, key, order),
+        selection: selectionSortSteps(state.students, key, order),
+        shell: shellSortSteps(state.students, key, order)
+      };
 
-    document.getElementById("bBarComp").style.width = (rb.comparisons / maxVal * 100) + "%";
-    document.getElementById("bBarSwap").style.width = (rb.swaps / maxVal * 100) + "%";
-    document.getElementById("bBarTotal").style.width = (totalB / maxVal * 100) + "%";
-    document.getElementById("iBarComp").style.width = (ri.comparisons / maxVal * 100) + "%";
-    document.getElementById("iBarSwap").style.width = (ri.swaps / maxVal * 100) + "%";
-    document.getElementById("iBarTotal").style.width = (totalI / maxVal * 100) + "%";
+      var totals = {
+        bubble: res.bubble.comparisons + res.bubble.swaps,
+        insertion: res.insertion.comparisons + res.insertion.swaps,
+        selection: res.selection.comparisons + res.selection.swaps,
+        shell: res.shell.comparisons + res.shell.swaps
+      };
 
-    cardBubbleResult.classList.remove("winner-card");
-    cardInsertionResult.classList.remove("winner-card");
-    tagBubbleWin.classList.remove("show");
-    tagInsertionWin.classList.remove("show");
+      var maxVal = Math.max(
+        totals.bubble, totals.insertion, totals.selection, totals.shell,
+        res.bubble.comparisons, res.insertion.comparisons, res.selection.comparisons, res.shell.comparisons,
+        1
+      );
 
-    if (totalB === totalI) {
-      resultVerdict.innerHTML = "🏁 Untuk " + state.students.length + " data mahasiswa saat ini, <b>kedua algoritma sama cepat</b>: masing-masing melakukan " + totalB + " total operasi (perbandingan + tukar/geser).";
-    } else {
-      var winnerIsInsertion = totalI < totalB;
-      var winCard = winnerIsInsertion ? cardInsertionResult : cardBubbleResult;
-      var winTag = winnerIsInsertion ? tagInsertionWin : tagBubbleWin;
-      var winName = winnerIsInsertion ? "Insertion Sort" : "Bubble Sort";
-      var opsWin = Math.min(totalB, totalI), opsLose = Math.max(totalB, totalI);
+      var minTotal = Math.min(totals.bubble, totals.insertion, totals.selection, totals.shell);
+      var winners = [];
 
-      winCard.classList.add("winner-card");
-      winTag.classList.add("show");
-      resultVerdict.innerHTML = "🏆 Untuk " + state.students.length + " data mahasiswa saat ini, <b>" + winName + " lebih cepat</b> — hanya " + opsWin + " total operasi, dibanding " + opsLose + " operasi pada algoritma satunya. Hasil ini bisa berbeda tergantung seberapa acak susunan data awal.";
-    }
-  });
+      Object.keys(compareCards).forEach(function (k) {
+        var c = compareCards[k];
+        var r = res[k];
+        var tot = totals[k];
+
+        if (c.numComp) c.numComp.textContent = r.comparisons;
+        if (c.numSwap) c.numSwap.textContent = r.swaps;
+        if (c.numTotal) c.numTotal.textContent = tot;
+
+        if (c.barComp) c.barComp.style.width = ((r.comparisons / maxVal) * 100) + "%";
+        if (c.barSwap) c.barSwap.style.width = ((r.swaps / maxVal) * 100) + "%";
+        if (c.barTotal) c.barTotal.style.width = ((tot / maxVal) * 100) + "%";
+
+        var isWin = tot === minTotal;
+        if (isWin) winners.push(c.name);
+
+        if (c.card) c.card.classList.toggle("winner-card", isWin);
+        if (c.tag) c.tag.classList.toggle("show", isWin);
+      });
+
+      if (resultGrid) resultGrid.style.display = "grid";
+
+      if (resultVerdict) {
+        if (winners.length === 1) {
+          resultVerdict.innerHTML = "🏆 Untuk " + state.students.length + " data mahasiswa saat ini, <b>" + escapeHtml(winners[0]) + " adalah yang paling efisien</b> dengan hanya " + minTotal + " total operasi (perbandingan + tukar/geser).";
+        } else {
+          resultVerdict.innerHTML = "🏁 Untuk " + state.students.length + " data mahasiswa saat ini, terjadi hasil imbang antara <b>" + escapeHtml(winners.join(" &amp; ")) + "</b> dengan masing-masing " + minTotal + " total operasi.";
+        }
+      }
+    });
+  }
 
   /* ================= LOCAL THEME TOGGLE & SYNC ================= */
   var themeToggle = document.getElementById("themeToggle");
   var THEME_KEY = "sik-theme";
 
-  function systemPrefersDark() { return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches); }
+  function systemPrefersDark() {
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+
   function isDarkActive() {
     var attr = document.documentElement.getAttribute("data-theme");
     if (attr === "dark") return true;
@@ -517,7 +799,7 @@
     else document.documentElement.removeAttribute("data-theme");
     if (themeToggle) {
       themeToggle.textContent = isDarkActive() ? "☀️" : "🌙";
-      themeToggle.title = isDarkActive() ? "Ganti ke Tema Light" : "Ganti ke Tema Dark";
+      themeToggle.title = isDarkActive() ? "Ganti ke Tema Arona (Light)" : "Ganti ke Tema Plana (Dark)";
     }
   }
 
@@ -550,6 +832,6 @@
   /* ================= INIT ================= */
   SIKData.loadState();
   renderRoster();
-  renderCode(cols.bubble, BUBBLE_CODE);
-  renderCode(cols.insertion, INSERTION_CODE);
+  setupCol(col1, "bubble", col1.nameEl, col1.lblSwap);
+  setupCol(col2, "insertion", col2.nameEl, col2.lblSwap);
 })();

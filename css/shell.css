@@ -1,5 +1,7 @@
 html {
   height: 100%;
+  overflow: hidden;
+  scrollbar-gutter: stable;
   scroll-padding-top: env(safe-area-inset-top, 0px);
   -webkit-text-size-adjust: 100%;
   box-sizing: border-box;
@@ -8,6 +10,8 @@ html {
 body {
   margin: 0;
   height: 100%;
+  overflow: hidden;
+  scrollbar-gutter: stable;
   background: var(--bg-img) no-repeat center center fixed, var(--bg);
   background-size: cover;
   color: var(--text);
@@ -15,7 +19,6 @@ body {
   -webkit-font-smoothing: antialiased;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 header.shell-top {
@@ -157,6 +160,7 @@ main.shell-body {
   flex: 1;
   min-height: 0;
   position: relative;
+  overflow: hidden;
 }
 
 .frame-wrap {
@@ -165,7 +169,7 @@ main.shell-body {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.2s ease;
+  overflow: hidden;
 }
 
 .frame-wrap.active {

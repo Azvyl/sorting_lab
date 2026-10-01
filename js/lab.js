@@ -196,11 +196,17 @@
     renderStep(steps[stepIndex]);
   }
 
+  function getDelay() {
+    const min = Number(speedInput.min) || 60;
+    const max = Number(speedInput.max) || 900;
+    return (max + min) - Number(speedInput.value);
+  }
+
   function tick() {
     if (!playing) return;
     const ok = stepForward();
     if (!ok) return;
-    playTimer = setTimeout(tick, Number(speedInput.value));
+    playTimer = setTimeout(tick, getDelay());
   }
 
   function play() {
@@ -208,7 +214,7 @@
     playing = true;
     btnPlay.textContent = "⏸ JEDA";
     clearTimeout(playTimer);
-    playTimer = setTimeout(tick, Number(speedInput.value));
+    playTimer = setTimeout(tick, getDelay());
   }
 
   function pause() {
@@ -354,6 +360,12 @@
   btnPrev.addEventListener("click", () => { pause(); stepBack(); });
   btnReset.addEventListener("click", () => { pause(); goTo(0); });
   btnShuffle.addEventListener("click", reshuffle);
+  speedInput.addEventListener("input", () => {
+    if (playing) {
+      clearTimeout(playTimer);
+      playTimer = setTimeout(tick, getDelay());
+    }
+  });
 
   /* ---------- Local Theme Toggle & Sync ---------- */
   const themeToggle = document.getElementById("themeToggle");
