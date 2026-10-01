@@ -38,7 +38,7 @@
       <!-- ===== VIEW 1: DATA MAHASISWA ===== -->
       <section class="view active" id="view-data">
         <div class="view-head">
-          <h2>DATABASE MAHASISWA</h2>
+          <h2><span style="color:var(--accent)">❖</span> DATABASE MAHASISWA</h2>
           <p>Kelola daftar mahasiswa satu kelas: tambah, hapus, dan pantau nilai. Data ini yang akan dieksekusi pada tahap visualisasi pengurutan.</p>
         </div>
 
@@ -83,7 +83,7 @@
       <!-- ===== VIEW 2: VISUALISASI URUTAN ===== -->
       <section class="view" id="view-sort">
         <div class="view-head">
-          <h2>VISUALISASI EKSEKUSI DATA</h2>
+          <h2><span style="color:var(--accent)">❖</span> VISUALISASI EKSEKUSI DATA</h2>
           <p>Adu algoritma pengurutan secara berdampingan pada data kelas yang sama untuk membandingkan langkah, perbandingan, dan pertukaran secara langsung.</p>
         </div>
 
@@ -107,18 +107,24 @@
             <label for="selAlgo1">ALGORITMA 1</label>
             <select id="selAlgo1">
               <option value="bubble" selected>Bubble Sort</option>
-              <option value="insertion">Insertion Sort</option>
+              <option value="exchange">Exchange Sort</option>
               <option value="selection">Selection Sort</option>
+              <option value="insertion">Insertion Sort</option>
               <option value="shell">Shell Sort</option>
+              <option value="quick">Quick Sort</option>
+              <option value="radix">Radix Sort</option>
             </select>
           </div>
           <div class="field">
             <label for="selAlgo2">ALGORITMA 2</label>
             <select id="selAlgo2">
               <option value="bubble">Bubble Sort</option>
-              <option value="insertion" selected>Insertion Sort</option>
+              <option value="exchange">Exchange Sort</option>
               <option value="selection">Selection Sort</option>
+              <option value="insertion" selected>Insertion Sort</option>
               <option value="shell">Shell Sort</option>
+              <option value="quick">Quick Sort</option>
+              <option value="radix">Radix Sort</option>
             </select>
           </div>
           <button class="btn primary" id="btnRun">▶ JALANKAN EKSEKUSI</button>
@@ -189,7 +195,7 @@
       <!-- ===== VIEW 3: BANDINGKAN ===== -->
       <section class="view" id="view-compare">
         <div class="view-head">
-          <h2>BANDINGKAN ALGORITMA</h2>
+          <h2><span style="color:var(--accent)">❖</span> BANDINGKAN ALGORITMA</h2>
           <p>Analisis karakteristik teoretis dan komputasi riil dari data mahasiswa saat ini untuk menentukan algoritma yang paling efisien.</p>
         </div>
 
@@ -198,33 +204,45 @@
             <thead>
               <tr>
                 <th>ASPEK</th>
-                <th>BUBBLE SORT</th>
-                <th>INSERTION SORT</th>
-                <th>SELECTION SORT</th>
-                <th>SHELL SORT</th>
+                <th>BUBBLE</th>
+                <th>EXCHANGE</th>
+                <th>SELECTION</th>
+                <th>INSERTION</th>
+                <th>SHELL</th>
+                <th>QUICK</th>
+                <th>RADIX</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td class="label">Cara Kerja</td>
                 <td>Membandingkan pasangan bersebelahan berulang kali dan menukarnya jika salah urutan.</td>
-                <td>Menyisipkan elemen ke posisi yang tepat pada kelompok yang sudah terurut sebelumnya.</td>
+                <td>Membandingkan elemen acuan i dengan tiap elemen kanannya j dan langsung menukar saat salah urutan.</td>
                 <td>Mencari elemen minimum dari sisa data dan menukarnya ke posisi awal yang belum terurut.</td>
-                <td>Mengembangkan insertion sort dengan membandingkan elemen berjarak interval (gap).</td>
+                <td>Menyisipkan elemen ke posisi yang tepat pada kelompok yang sudah terurut sebelumnya.</td>
+                <td>Mengembangkan insertion sort dengan membandingkan elemen berjarak interval (gap) bertahap.</td>
+                <td>Memilih pivot, mempartisi array ke kiri/kanan pivot, dan mengurutkan secara rekursif.</td>
+                <td>Mengurutkan elemen digit demi digit (LSD) melalui proses pengelompokan non-komparatif.</td>
               </tr>
               <tr>
                 <td class="label">Kompleksitas Terbaik</td>
-                <td>O(n) — data terurut</td>
-                <td>O(n) — data terurut</td>
+                <td>O(n)</td>
                 <td>O(n²)</td>
+                <td>O(n²)</td>
+                <td>O(n)</td>
                 <td>O(n log n)</td>
+                <td>O(n log n)</td>
+                <td>O(d &middot; (n + k))</td>
               </tr>
               <tr>
                 <td class="label">Kompleksitas Rata-rata</td>
                 <td>O(n²)</td>
                 <td>O(n²)</td>
                 <td>O(n²)</td>
+                <td>O(n²)</td>
                 <td>O(n^(4/3)) atau O(n^(3/2))</td>
+                <td>O(n log n)</td>
+                <td>O(d &middot; (n + k))</td>
               </tr>
               <tr>
                 <td class="label">Kompleksitas Terburuk</td>
@@ -232,27 +250,39 @@
                 <td>O(n²)</td>
                 <td>O(n²)</td>
                 <td>O(n²)</td>
+                <td>O(n²)</td>
+                <td>O(n²)</td>
+                <td>O(d &middot; (n + k))</td>
               </tr>
               <tr>
                 <td class="label">Ruang Tambahan</td>
-                <td>O(1) (in-place)</td>
-                <td>O(1) (in-place)</td>
-                <td>O(1) (in-place)</td>
-                <td>O(1) (in-place)</td>
+                <td>O(1)</td>
+                <td>O(1)</td>
+                <td>O(1)</td>
+                <td>O(1)</td>
+                <td>O(1)</td>
+                <td>O(log n)</td>
+                <td>O(n + k)</td>
               </tr>
               <tr>
                 <td class="label">Stabil?</td>
                 <td>Ya</td>
+                <td>Tidak</td>
+                <td>Tidak</td>
                 <td>Ya</td>
                 <td>Tidak</td>
                 <td>Tidak</td>
+                <td>Ya</td>
               </tr>
               <tr>
                 <td class="label">Cocok Untuk</td>
-                <td>Data kecil, pengenalan konsep pertukaran.</td>
+                <td>Data kecil, konsep edukasi gelembung nilai.</td>
+                <td>Data kecil, pertukaran langsung sederhana.</td>
+                <td>Data kecil di mana operasi tulis/swap harus minim.</td>
                 <td>Data kecil atau data yang sudah hampir terurut.</td>
-                <td>Data kecil di mana penulisan memori/tukar harus minimal.</td>
                 <td>Data ukuran sedang dengan performa lebih cepat dari O(n²).</td>
+                <td>Data besar, algoritma umum in-place tercepat secara rata-rata.</td>
+                <td>Data numerik bulat/kunci berdigit dengan rentang nilai terbatas.</td>
               </tr>
             </tbody>
           </table>
@@ -279,7 +309,7 @@
 
         <div class="result-grid" id="resultGrid" style="display:none;">
           <div class="card result-card" id="cardBubbleResult">
-            <h3>Bubble Sort <span class="win-tag" id="tagBubbleWin">LEBIH CEPAT</span></h3>
+            <h3>Bubble Sort <span class="win-tag" id="tagBubbleWin">TERCEPAT 🏆</span></h3>
             <div class="bar-row">
               <span class="lbl">Perbandingan</span>
               <div class="bar-track">
@@ -303,33 +333,33 @@
             </div>
           </div>
 
-          <div class="card result-card" id="cardInsertionResult">
-            <h3>Insertion Sort <span class="win-tag" id="tagInsertionWin">LEBIH CEPAT</span></h3>
+          <div class="card result-card" id="cardExchangeResult">
+            <h3>Exchange Sort <span class="win-tag" id="tagExchangeWin">TERCEPAT 🏆</span></h3>
             <div class="bar-row">
               <span class="lbl">Perbandingan</span>
               <div class="bar-track">
-                <div class="bar-fill" id="iBarComp" style="background:var(--amber)"></div>
+                <div class="bar-fill" id="exBarComp" style="background:var(--amber)"></div>
               </div>
-              <span class="num" id="iNumComp">0</span>
+              <span class="num" id="exNumComp">0</span>
             </div>
             <div class="bar-row">
-              <span class="lbl">Geser</span>
+              <span class="lbl">Pertukaran</span>
               <div class="bar-track">
-                <div class="bar-fill" id="iBarSwap" style="background:var(--coral)"></div>
+                <div class="bar-fill" id="exBarSwap" style="background:var(--coral)"></div>
               </div>
-              <span class="num" id="iNumSwap">0</span>
+              <span class="num" id="exNumSwap">0</span>
             </div>
             <div class="bar-row">
               <span class="lbl">Total Operasi</span>
               <div class="bar-track">
-                <div class="bar-fill" id="iBarTotal" style="background:var(--accent)"></div>
+                <div class="bar-fill" id="exBarTotal" style="background:var(--accent)"></div>
               </div>
-              <span class="num" id="iNumTotal">0</span>
+              <span class="num" id="exNumTotal">0</span>
             </div>
           </div>
 
           <div class="card result-card" id="cardSelectionResult">
-            <h3>Selection Sort <span class="win-tag" id="tagSelectionWin">LEBIH CEPAT</span></h3>
+            <h3>Selection Sort <span class="win-tag" id="tagSelectionWin">TERCEPAT 🏆</span></h3>
             <div class="bar-row">
               <span class="lbl">Perbandingan</span>
               <div class="bar-track">
@@ -353,8 +383,33 @@
             </div>
           </div>
 
+          <div class="card result-card" id="cardInsertionResult">
+            <h3>Insertion Sort <span class="win-tag" id="tagInsertionWin">TERCEPAT 🏆</span></h3>
+            <div class="bar-row">
+              <span class="lbl">Perbandingan</span>
+              <div class="bar-track">
+                <div class="bar-fill" id="iBarComp" style="background:var(--amber)"></div>
+              </div>
+              <span class="num" id="iNumComp">0</span>
+            </div>
+            <div class="bar-row">
+              <span class="lbl">Geser</span>
+              <div class="bar-track">
+                <div class="bar-fill" id="iBarSwap" style="background:var(--coral)"></div>
+              </div>
+              <span class="num" id="iNumSwap">0</span>
+            </div>
+            <div class="bar-row">
+              <span class="lbl">Total Operasi</span>
+              <div class="bar-track">
+                <div class="bar-fill" id="iBarTotal" style="background:var(--accent)"></div>
+              </div>
+              <span class="num" id="iNumTotal">0</span>
+            </div>
+          </div>
+
           <div class="card result-card" id="cardShellResult">
-            <h3>Shell Sort <span class="win-tag" id="tagShellWin">LEBIH CEPAT</span></h3>
+            <h3>Shell Sort <span class="win-tag" id="tagShellWin">TERCEPAT 🏆</span></h3>
             <div class="bar-row">
               <span class="lbl">Perbandingan</span>
               <div class="bar-track">
@@ -375,6 +430,56 @@
                 <div class="bar-fill" id="shBarTotal" style="background:var(--accent)"></div>
               </div>
               <span class="num" id="shNumTotal">0</span>
+            </div>
+          </div>
+
+          <div class="card result-card" id="cardQuickResult">
+            <h3>Quick Sort <span class="win-tag" id="tagQuickWin">TERCEPAT 🏆</span></h3>
+            <div class="bar-row">
+              <span class="lbl">Perbandingan</span>
+              <div class="bar-track">
+                <div class="bar-fill" id="qBarComp" style="background:var(--amber)"></div>
+              </div>
+              <span class="num" id="qNumComp">0</span>
+            </div>
+            <div class="bar-row">
+              <span class="lbl">Pertukaran</span>
+              <div class="bar-track">
+                <div class="bar-fill" id="qBarSwap" style="background:var(--coral)"></div>
+              </div>
+              <span class="num" id="qNumSwap">0</span>
+            </div>
+            <div class="bar-row">
+              <span class="lbl">Total Operasi</span>
+              <div class="bar-track">
+                <div class="bar-fill" id="qBarTotal" style="background:var(--accent)"></div>
+              </div>
+              <span class="num" id="qNumTotal">0</span>
+            </div>
+          </div>
+
+          <div class="card result-card" id="cardRadixResult">
+            <h3>Radix Sort <span class="win-tag" id="tagRadixWin">TERCEPAT 🏆</span></h3>
+            <div class="bar-row">
+              <span class="lbl">Perbandingan</span>
+              <div class="bar-track">
+                <div class="bar-fill" id="rxBarComp" style="background:var(--amber)"></div>
+              </div>
+              <span class="num" id="rxNumComp">0</span>
+            </div>
+            <div class="bar-row">
+              <span class="lbl">Distribusi</span>
+              <div class="bar-track">
+                <div class="bar-fill" id="rxBarSwap" style="background:var(--coral)"></div>
+              </div>
+              <span class="num" id="rxNumSwap">0</span>
+            </div>
+            <div class="bar-row">
+              <span class="lbl">Total Operasi</span>
+              <div class="bar-track">
+                <div class="bar-fill" id="rxBarTotal" style="background:var(--accent)"></div>
+              </div>
+              <span class="num" id="rxNumTotal">0</span>
             </div>
           </div>
         </div>

@@ -105,7 +105,11 @@
         if (views[k]) views[k].classList.remove("active");
       });
       var targetView = views[btn.getAttribute("data-view")];
-      if (targetView) targetView.classList.add("active");
+      if (targetView) {
+        targetView.classList.add("active");
+        var paperEl = document.querySelector("main.paper");
+        if (paperEl) paperEl.scrollTop = 0;
+      }
     });
   });
 
@@ -277,6 +281,209 @@
     return { steps: steps, comparisons: comparisons, swaps: swaps, result: arr };
   }
 
+  /* 5. EXCHANGE SORT */
+  function exchangeSortSteps(dataArr, key, order) {
+    var arr = dataArr.slice(); var n = arr.length;
+    var comparisons = 0, swaps = 0, sortedIdx = [];
+    var steps = [];
+
+    function snap(extra) {
+      var s = {
+        array: arr.slice(), sorted: sortedIdx.slice(), comparisons: comparisons, swaps: swaps,
+        compare: [], swap: [], active: null, note: "", line: 0
+      };
+      Object.assign(s, extra);
+      steps.push(s);
+    }
+
+    snap({ line: 0, note: "Mulai Exchange Sort — bandingkan acuan posisi i dengan elemen j di kanannya." });
+    for (var i = 0; i < n - 1; i++) {
+      snap({ line: 2, active: i, note: "Mulai iterasi i = " + i + " (" + escapeHtml(arr[i].nama) + ")." });
+      for (var j = i + 1; j < n; j++) {
+        comparisons++;
+        var willSwap = cmp(arr[i], arr[j], key, order) > 0;
+        snap({
+          line: 4, active: i, compare: [i, j],
+          note: "Bandingkan posisi " + i + " (" + escapeHtml(arr[i][key]) + ") dengan posisi " + j + " (" + escapeHtml(arr[j][key]) + ")."
+        });
+        if (willSwap) {
+          var t = arr[i]; arr[i] = arr[j]; arr[j] = t; swaps++;
+          snap({ line: 5, active: i, swap: [i, j], note: "Posisi " + i + " > posisi " + j + " — tukar segera." });
+        }
+      }
+      sortedIdx.push(i);
+      snap({ line: 6, sorted: sortedIdx.slice(), note: "Posisi " + i + " kini terurut pasti." });
+    }
+    sortedIdx = arr.map(function (_, idx) { return idx; });
+    snap({ line: 7, sorted: sortedIdx.slice(), note: "Selesai — seluruh data terurut." });
+    return { steps: steps, comparisons: comparisons, swaps: swaps, result: arr };
+  }
+
+  /* 6. QUICK SORT */
+  function quickSortSteps(dataArr, key, order) {
+    var arr = dataArr.slice(); var n = arr.length;
+    var comparisons = 0, swaps = 0, sortedIdx = [];
+    var steps = [];
+
+    function snap(extra) {
+      var s = {
+        array: arr.slice(), sorted: sortedIdx.slice(), comparisons: comparisons, swaps: swaps,
+        compare: [], swap: [], active: null, note: "", line: 0
+      };
+      Object.assign(s, extra);
+      steps.push(s);
+    }
+
+    snap({ line: 0, note: "Mulai Quick Sort — partisi array rekursif berbasis pivot." });
+
+    function partition(low, high) {
+      var pivotVal = arr[high];
+      snap({ line: 2, active: high, note: "Pilih pivot di posisi " + high + " (" + escapeHtml(pivotVal[key]) + ")." });
+      var i = low - 1;
+      for (var j = low; j < high; j++) {
+        comparisons++;
+        var isLess = cmp(arr[j], pivotVal, key, order) < 0;
+        snap({
+          line: 4, active: high, compare: [j, high],
+          note: "Bandingkan data pos " + j + " (" + escapeHtml(arr[j][key]) + ") dengan pivot (" + escapeHtml(pivotVal[key]) + ")."
+        });
+        if (isLess) {
+          i++;
+          if (i !== j) {
+            var t = arr[i]; arr[i] = arr[j]; arr[j] = t; swaps++;
+            snap({ line: 6, active: high, swap: [i, j], note: "Tukar elemen pos " + i + " dengan pos " + j + "." });
+          }
+        }
+      }
+      var pi = i + 1;
+      if (pi !== high) {
+        var t2 = arr[pi]; arr[pi] = arr[high]; arr[high] = t2; swaps++;
+        snap({ line: 7, swap: [pi, high], note: "Tempatkan pivot ke posisi partisi " + pi + "." });
+      }
+      if (sortedIdx.indexOf(pi) === -1) sortedIdx.push(pi);
+      snap({ line: 8, sorted: sortedIdx.slice(), note: "Pivot di posisi " + pi + " berada di urutan final." });
+      return pi;
+    }
+
+    function sortRecurse(low, high) {
+      if (low < high) {
+        snap({ line: 1, note: "Proses subarray dari posisi " + low + " sampai " + high + "." });
+        var pi = partition(low, high);
+        sortRecurse(low, pi - 1);
+        sortRecurse(pi + 1, high);
+      } else if (low === high) {
+        if (sortedIdx.indexOf(low) === -1) sortedIdx.push(low);
+        snap({ line: 1, sorted: sortedIdx.slice(), note: "Elemen tunggal di posisi " + low + " sudah terurut." });
+      }
+    }
+
+    sortRecurse(0, n - 1);
+    sortedIdx = arr.map(function (_, idx) { return idx; });
+    snap({ line: 9, sorted: sortedIdx.slice(), note: "Selesai — seluruh data terurut." });
+    return { steps: steps, comparisons: comparisons, swaps: swaps, result: arr };
+  }
+
+  /* 7. RADIX SORT */
+  function radixSortSteps(dataArr, key, order) {
+    var arr = dataArr.slice(); var n = arr.length;
+    var comparisons = 0, swaps = 0, sortedIdx = [];
+    var steps = [];
+
+    function snap(extra) {
+      var s = {
+        array: arr.slice(), sorted: sortedIdx.slice(), comparisons: comparisons, swaps: swaps,
+        compare: [], swap: [], active: null, note: "", line: 0
+      };
+      Object.assign(s, extra);
+      steps.push(s);
+    }
+
+    snap({ line: 0, note: "Mulai Radix Sort — pengurutan per digit/karakter non-komparatif." });
+
+    if (key === "nama") {
+      var maxLen = 0;
+      arr.forEach(function (s) { if (s.nama.length > maxLen) maxLen = s.nama.length; });
+      snap({ line: 1, note: "Panjang karakter maksimum nama: " + maxLen + " karakter." });
+
+      for (var col = maxLen - 1; col >= 0; col--) {
+        snap({ line: 2, note: "Pass karakter indeks ke-" + (col + 1) + " (dari kanan ke kiri)." });
+        var buckets = [];
+        for (var b = 0; b < 256; b++) buckets.push([]);
+
+        for (var i = 0; i < n; i++) {
+          var ch = col < arr[i].nama.length ? arr[i].nama.charCodeAt(col) : 0;
+          var chChar = col < arr[i].nama.length ? arr[i].nama[col] : "∅";
+          buckets[ch].push(arr[i]);
+          snap({
+            line: 4, active: i,
+            note: "Karakter pos " + (col + 1) + " untuk " + escapeHtml(arr[i].nama) + " adalah '" + chChar + "'."
+          });
+        }
+
+        var newArr = [];
+        if (order === "desc") {
+          for (var b = 255; b >= 0; b--) {
+            for (var k = 0; k < buckets[b].length; k++) {
+              newArr.push(buckets[b][k]); swaps++;
+            }
+          }
+        } else {
+          for (var b = 0; b < 256; b++) {
+            for (var k = 0; k < buckets[b].length; k++) {
+              newArr.push(buckets[b][k]); swaps++;
+            }
+          }
+        }
+        arr = newArr;
+        snap({ line: 8, swap: arr.map(function (_, idx) { return idx; }), note: "Hasil susunan data setelah pass karakter ke-" + (col + 1) + "." });
+      }
+    } else {
+      var getNum = function (s) {
+        if (key === "nilai") return Number(s.nilai) || 0;
+        return parseInt(String(s.nim).replace(/\D/g, ""), 10) || 0;
+      };
+      var maxVal = 0;
+      arr.forEach(function (s) { var v = getNum(s); if (v > maxVal) maxVal = v; });
+      snap({ line: 1, note: "Nilai maksimum data: " + maxVal + " (menentukan jumlah pass digit)." });
+
+      for (var exp = 1; Math.floor(maxVal / exp) > 0; exp *= 10) {
+        snap({ line: 2, note: "Pass digit kelipatan exp = " + exp + " (" + (exp === 1 ? "Satuan" : (exp === 10 ? "Puluhan" : (exp === 100 ? "Ratusan" : exp))) + ")." });
+        var buckets = [[], [], [], [], [], [], [], [], [], []];
+
+        for (var i = 0; i < n; i++) {
+          var num = getNum(arr[i]);
+          var digit = Math.floor(num / exp) % 10;
+          buckets[digit].push(arr[i]);
+          snap({
+            line: 4, active: i,
+            note: "Data " + escapeHtml(arr[i].nama) + " (" + escapeHtml(arr[i][key]) + ") — digit: " + digit + "."
+          });
+        }
+
+        var newArr = [];
+        if (order === "desc") {
+          for (var d = 9; d >= 0; d--) {
+            for (var k = 0; k < buckets[d].length; k++) {
+              newArr.push(buckets[d][k]); swaps++;
+            }
+          }
+        } else {
+          for (var d = 0; d < 10; d++) {
+            for (var k = 0; k < buckets[d].length; k++) {
+              newArr.push(buckets[d][k]); swaps++;
+            }
+          }
+        }
+        arr = newArr;
+        snap({ line: 8, swap: arr.map(function (_, idx) { return idx; }), note: "Hasil susunan data setelah pass digit exp = " + exp + "." });
+      }
+    }
+
+    sortedIdx = arr.map(function (_, idx) { return idx; });
+    snap({ line: 9, sorted: sortedIdx.slice(), note: "Selesai — seluruh data terurut." });
+    return { steps: steps, comparisons: comparisons, swaps: swaps, result: arr };
+  }
+
   /* ALGORITHM REGISTRY */
   var ALGO_DEFS = {
     bubble: {
@@ -294,23 +501,20 @@
       ],
       run: bubbleSortSteps
     },
-    insertion: {
-      name: "Insertion Sort",
-      swapLabel: "Geser",
+    exchange: {
+      name: "Exchange Sort",
+      swapLabel: "Tukar",
       code: [
-        "function insertionSort(data, kunci, arah):",
+        "function exchangeSort(data, kunci, arah):",
         "  n ← panjang(data)",
-        "  // data[0] dianggap sudah terurut",
-        "  untuk i dari 1 sampai n-1:",
-        "    kunci_baris ← data[i]",
-        "    j ← i - 1",
-        "    selama j ≥ 0 dan data[j] > kunci_baris:",
-        "      data[j+1] ← data[j]",
-        "      j ← j - 1",
-        "    data[j+1] ← kunci_baris",
+        "  untuk i dari 0 sampai n-2:",
+        "    untuk j dari i+1 sampai n-1:",
+        "      jika data[i] > data[j]:",
+        "        tukar(data[i], data[j])",
+        "    // posisi i sudah terurut",
         "  kembalikan data"
       ],
-      run: insertionSortSteps
+      run: exchangeSortSteps
     },
     selection: {
       name: "Selection Sort",
@@ -329,6 +533,24 @@
         "  kembalikan data"
       ],
       run: selectionSortSteps
+    },
+    insertion: {
+      name: "Insertion Sort",
+      swapLabel: "Geser",
+      code: [
+        "function insertionSort(data, kunci, arah):",
+        "  n ← panjang(data)",
+        "  // data[0] dianggap sudah terurut",
+        "  untuk i dari 1 sampai n-1:",
+        "    kunci_baris ← data[i]",
+        "    j ← i - 1",
+        "    selama j ≥ 0 dan data[j] > kunci_baris:",
+        "      data[j+1] ← data[j]",
+        "      j ← j - 1",
+        "    data[j+1] ← kunci_baris",
+        "  kembalikan data"
+      ],
+      run: insertionSortSteps
     },
     shell: {
       name: "Shell Sort",
@@ -349,6 +571,45 @@
         "  kembalikan data"
       ],
       run: shellSortSteps
+    },
+    quick: {
+      name: "Quick Sort",
+      swapLabel: "Tukar",
+      code: [
+        "function quickSort(data, low, high):",
+        "  jika low < high:",
+        "    pivot ← data[high]",
+        "    i ← low - 1",
+        "    untuk j dari low sampai high-1:",
+        "      jika data[j] < pivot:",
+        "        i ← i + 1",
+        "        tukar(data[i], data[j])",
+        "    tukar(data[i+1], data[high])",
+        "    pi ← i + 1",
+        "    quickSort(data, low, pi - 1)",
+        "    quickSort(data, pi + 1, high)"
+      ],
+      run: quickSortSteps
+    },
+    radix: {
+      name: "Radix Sort",
+      swapLabel: "Distribusi",
+      code: [
+        "function radixSort(data, kunci, arah):",
+        "  n ← panjang(data)",
+        "  digit_maks ← hitung_digit_maksimum(data, kunci)",
+        "  untuk exp dari 1, 10, 100, ...:",
+        "    output ← array_baru(n)",
+        "    count ← hitung_frekuensi_digit(data, exp)",
+        "    akumulasi_prefix_sum(count)",
+        "    untuk i dari n-1 mundur ke 0:",
+        "      digit ← ambil_digit(data[i], exp)",
+        "      output[count[digit] - 1] ← data[i]",
+        "      count[digit] ← count[digit] - 1",
+        "    data ← output",
+        "  kembalikan data"
+      ],
+      run: radixSortSteps
     }
   };
 
@@ -471,7 +732,7 @@
         stateAttr = "compare"; tagText = "CMP";
       }
       if (step.swap && step.swap.indexOf(i) !== -1) {
-        stateAttr = "swap"; tagText = col.key === "insertion" || col.key === "shell" ? "SHIFT" : "SWAP";
+        stateAttr = "swap"; tagText = col.key === "insertion" || col.key === "shell" ? "SHIFT" : (col.key === "radix" ? "MOVE" : "SWAP");
       }
       if (step.active === i) {
         stateAttr = "active"; tagText = "KEY";
@@ -621,6 +882,36 @@
     goTo(0);
   }
 
+  /* Mutual exclusivity and automatic swap between Algo 1 & Algo 2 */
+  var prevAlgo1 = selAlgo1 ? selAlgo1.value : "bubble";
+  var prevAlgo2 = selAlgo2 ? selAlgo2.value : "insertion";
+
+  if (selAlgo1) {
+    selAlgo1.addEventListener("change", function () {
+      if (selAlgo1.value === selAlgo2.value) {
+        selAlgo2.value = prevAlgo1;
+        prevAlgo2 = selAlgo2.value;
+      }
+      prevAlgo1 = selAlgo1.value;
+      pause();
+      setupCol(col1, selAlgo1.value, col1.nameEl, col1.lblSwap);
+      setupCol(col2, selAlgo2.value, col2.nameEl, col2.lblSwap);
+    });
+  }
+
+  if (selAlgo2) {
+    selAlgo2.addEventListener("change", function () {
+      if (selAlgo2.value === selAlgo1.value) {
+        selAlgo1.value = prevAlgo2;
+        prevAlgo1 = selAlgo1.value;
+      }
+      prevAlgo2 = selAlgo2.value;
+      pause();
+      setupCol(col1, selAlgo1.value, col1.nameEl, col1.lblSwap);
+      setupCol(col2, selAlgo2.value, col2.nameEl, col2.lblSwap);
+    });
+  }
+
   if (btnRun) btnRun.addEventListener("click", runVisualization);
   if (btnPlay) btnPlay.addEventListener("click", function () { playing ? pause() : play(); });
   if (btnNext) btnNext.addEventListener("click", function () { pause(); stepForward(); });
@@ -646,7 +937,7 @@
     });
   }
 
-  /* ================= VIEW BANDINGKAN (4 ALGORITMA) ================= */
+  /* ================= VIEW BANDINGKAN (7 ALGORITMA) ================= */
   var cmpKey = document.getElementById("cmpKey");
   var cmpOrder = document.getElementById("cmpOrder");
   var btnCompareRun = document.getElementById("btnCompareRun");
@@ -665,16 +956,16 @@
       numTotal: document.getElementById("bNumTotal"),
       name: "Bubble Sort"
     },
-    insertion: {
-      card: document.getElementById("cardInsertionResult"),
-      tag: document.getElementById("tagInsertionWin"),
-      barComp: document.getElementById("iBarComp"),
-      barSwap: document.getElementById("iBarSwap"),
-      barTotal: document.getElementById("iBarTotal"),
-      numComp: document.getElementById("iNumComp"),
-      numSwap: document.getElementById("iNumSwap"),
-      numTotal: document.getElementById("iNumTotal"),
-      name: "Insertion Sort"
+    exchange: {
+      card: document.getElementById("cardExchangeResult"),
+      tag: document.getElementById("tagExchangeWin"),
+      barComp: document.getElementById("exBarComp"),
+      barSwap: document.getElementById("exBarSwap"),
+      barTotal: document.getElementById("exBarTotal"),
+      numComp: document.getElementById("exNumComp"),
+      numSwap: document.getElementById("exNumSwap"),
+      numTotal: document.getElementById("exNumTotal"),
+      name: "Exchange Sort"
     },
     selection: {
       card: document.getElementById("cardSelectionResult"),
@@ -687,6 +978,17 @@
       numTotal: document.getElementById("sNumTotal"),
       name: "Selection Sort"
     },
+    insertion: {
+      card: document.getElementById("cardInsertionResult"),
+      tag: document.getElementById("tagInsertionWin"),
+      barComp: document.getElementById("iBarComp"),
+      barSwap: document.getElementById("iBarSwap"),
+      barTotal: document.getElementById("iBarTotal"),
+      numComp: document.getElementById("iNumComp"),
+      numSwap: document.getElementById("iNumSwap"),
+      numTotal: document.getElementById("iNumTotal"),
+      name: "Insertion Sort"
+    },
     shell: {
       card: document.getElementById("cardShellResult"),
       tag: document.getElementById("tagShellWin"),
@@ -697,6 +999,28 @@
       numSwap: document.getElementById("shNumSwap"),
       numTotal: document.getElementById("shNumTotal"),
       name: "Shell Sort"
+    },
+    quick: {
+      card: document.getElementById("cardQuickResult"),
+      tag: document.getElementById("tagQuickWin"),
+      barComp: document.getElementById("qBarComp"),
+      barSwap: document.getElementById("qBarSwap"),
+      barTotal: document.getElementById("qBarTotal"),
+      numComp: document.getElementById("qNumComp"),
+      numSwap: document.getElementById("qNumSwap"),
+      numTotal: document.getElementById("qNumTotal"),
+      name: "Quick Sort"
+    },
+    radix: {
+      card: document.getElementById("cardRadixResult"),
+      tag: document.getElementById("tagRadixWin"),
+      barComp: document.getElementById("rxBarComp"),
+      barSwap: document.getElementById("rxBarSwap"),
+      barTotal: document.getElementById("rxBarTotal"),
+      numComp: document.getElementById("rxNumComp"),
+      numSwap: document.getElementById("rxNumSwap"),
+      numTotal: document.getElementById("rxNumTotal"),
+      name: "Radix Sort"
     }
   };
 
@@ -711,25 +1035,26 @@
 
       var res = {
         bubble: bubbleSortSteps(state.students, key, order),
-        insertion: insertionSortSteps(state.students, key, order),
+        exchange: exchangeSortSteps(state.students, key, order),
         selection: selectionSortSteps(state.students, key, order),
-        shell: shellSortSteps(state.students, key, order)
+        insertion: insertionSortSteps(state.students, key, order),
+        shell: shellSortSteps(state.students, key, order),
+        quick: quickSortSteps(state.students, key, order),
+        radix: radixSortSteps(state.students, key, order)
       };
 
-      var totals = {
-        bubble: res.bubble.comparisons + res.bubble.swaps,
-        insertion: res.insertion.comparisons + res.insertion.swaps,
-        selection: res.selection.comparisons + res.selection.swaps,
-        shell: res.shell.comparisons + res.shell.swaps
-      };
+      var totals = {};
+      var allOps = [];
+      Object.keys(res).forEach(function (k) {
+        var op = res[k].comparisons + res[k].swaps;
+        totals[k] = op;
+        allOps.push(op);
+        allOps.push(res[k].comparisons);
+        allOps.push(res[k].swaps);
+      });
 
-      var maxVal = Math.max(
-        totals.bubble, totals.insertion, totals.selection, totals.shell,
-        res.bubble.comparisons, res.insertion.comparisons, res.selection.comparisons, res.shell.comparisons,
-        1
-      );
-
-      var minTotal = Math.min(totals.bubble, totals.insertion, totals.selection, totals.shell);
+      var maxVal = Math.max.apply(null, allOps.concat([1]));
+      var minTotal = Math.min.apply(null, Object.keys(totals).map(function (k) { return totals[k]; }));
       var winners = [];
 
       Object.keys(compareCards).forEach(function (k) {
@@ -756,9 +1081,9 @@
 
       if (resultVerdict) {
         if (winners.length === 1) {
-          resultVerdict.innerHTML = "🏆 Untuk " + state.students.length + " data mahasiswa saat ini, <b>" + escapeHtml(winners[0]) + " adalah yang paling efisien</b> dengan hanya " + minTotal + " total operasi (perbandingan + tukar/geser).";
+          resultVerdict.innerHTML = "🏆 Untuk " + state.students.length + " data mahasiswa saat ini, <b>" + escapeHtml(winners[0]) + " adalah yang paling efisien</b> dengan hanya " + minTotal + " total operasi (perbandingan + pertukaran/pergeseran/distribusi).";
         } else {
-          resultVerdict.innerHTML = "🏁 Untuk " + state.students.length + " data mahasiswa saat ini, terjadi hasil imbang antara <b>" + escapeHtml(winners.join(" &amp; ")) + "</b> dengan masing-masing " + minTotal + " total operasi.";
+          resultVerdict.innerHTML = "🏁 Untuk " + state.students.length + " data mahasiswa saat ini, terjadi hasil imbang efisiensi antara <b>" + escapeHtml(winners.join(" &amp; ")) + "</b> dengan masing-masing " + minTotal + " total operasi.";
         }
       }
     });
