@@ -303,6 +303,7 @@ main.content {
   font-size: 12px;
   line-height: 1.8;
   padding: 8px 0;
+  white-space: pre;
 }
 
 .code .line {
@@ -491,6 +492,19 @@ main.content {
   color: var(--accent-text);
   border-color: var(--accent);
   box-shadow: 0 0 10px var(--accent);
+}
+
+.controls .btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.controls .btn:disabled:hover {
+  background: rgba(10, 25, 50, 0.6);
+  border-color: var(--border);
+  color: var(--text);
+  box-shadow: none;
 }
 
 .controls .progress {

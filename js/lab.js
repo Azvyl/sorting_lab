@@ -1,6 +1,5 @@
 (function () {
   "use strict";
-
   const { ALGORITHMS, ORDER, COMPARE } = window.SortingLab;
 
   /* ---------- Utils ---------- */
@@ -207,14 +206,14 @@
   function play() {
     if (stepIndex >= steps.length - 1) stepIndex = 0;
     playing = true;
-    btnPlay.textContent = "⏸ Jeda";
+    btnPlay.textContent = " Jeda";
     clearTimeout(playTimer);
     playTimer = setTimeout(tick, Number(speedInput.value));
   }
 
   function pause() {
     playing = false;
-    btnPlay.textContent = "▶ Putar";
+    btnPlay.textContent = " Putar";
     clearTimeout(playTimer);
   }
 
@@ -385,14 +384,16 @@
     } else {
       document.documentElement.removeAttribute("data-theme");
     }
-    themeToggle.textContent = isDarkActive() ? "☀️" : "🌙";
+    if (themeToggle) themeToggle.textContent = isDarkActive() ? "☀️" : "🌙";
   }
 
-  themeToggle.addEventListener("click", () => {
-    const next = isDarkActive() ? "light" : "dark";
-    applyTheme(next);
-    saveThemePref(next);
-  });
+  if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      const next = isDarkActive() ? "light" : "dark";
+      applyTheme(next);
+      saveThemePref(next);
+    });
+  }
 
   applyTheme(loadThemePref());
 
