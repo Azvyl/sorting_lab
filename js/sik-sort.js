@@ -485,7 +485,7 @@
     }
   });
 
-  /* ================= LOCAL THEME TOGGLE ================= */
+  /* ================= LOCAL THEME TOGGLE & SYNC ================= */
   var themeToggle = document.getElementById("themeToggle");
   var THEME_KEY = "sik-theme";
 
@@ -497,18 +497,52 @@
     return systemPrefersDark();
   }
 
-  function loadThemePref() { try { return localStorage.getItem(THEME_KEY); } catch (e) { return null; } }
-  function saveThemePref(t) { try { localStorage.setItem(THEME_KEY, t); } catch (e) { } }
+  function loadThemePref() {
+    try {
+      return localStorage.getItem(THEME_KEY) || localStorage.getItem("shell-theme");
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function saveThemePref(t) {
+    try {
+      localStorage.setItem(THEME_KEY, t);
+      localStorage.setItem("shell-theme", t);
+    } catch (e) { }
+  }
 
   function applyTheme(theme) {
     if (theme === "light" || theme === "dark") document.documentElement.setAttribute("data-theme", theme);
     else document.documentElement.removeAttribute("data-theme");
-    themeToggle.textContent = isDarkActive() ? "☀️" : "🌙";
+    if (themeToggle) {
+      themeToggle.textContent = isDarkActive() ? "☀️" : "🌙";
+      themeToggle.title = isDarkActive() ? "Ganti ke Tema Light" : "Ganti ke Tema Dark";
+    }
   }
 
-  themeToggle.addEventListener("click", function () {
-    var next = isDarkActive() ? "light" : "dark";
-    applyTheme(next); saveThemePref(next);
+  if (themeToggle) {
+    themeToggle.addEventListener("click", function () {
+      var next = isDarkActive() ? "light" : "dark";
+      applyTheme(next);
+      saveThemePref(next);
+      try {
+        window.parent.postMessage({ type: "THEME_CHANGE", theme: next }, "*");
+      } catch (e) { }
+    });
+  }
+
+  window.addEventListener("message", function (e) {
+    if (e.data && e.data.type === "THEME_CHANGE" && e.data.theme) {
+      applyTheme(e.data.theme);
+      saveThemePref(e.data.theme);
+    }
+  });
+
+  window.addEventListener("storage", function (e) {
+    if ((e.key === THEME_KEY || e.key === "shell-theme") && e.newValue) {
+      applyTheme(e.newValue);
+    }
   });
 
   applyTheme(loadThemePref());

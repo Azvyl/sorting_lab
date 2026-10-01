@@ -8,7 +8,8 @@ html {
 body {
   margin: 0;
   min-height: 100%;
-  background: transparent;
+  background: var(--bg-img) no-repeat center center fixed, var(--bg);
+  background-size: cover;
   color: var(--text);
   font-family: var(--sans);
   -webkit-font-smoothing: antialiased;
@@ -24,7 +25,8 @@ body {
 .cover {
   background: var(--panel);
   border-right: 1px solid var(--border);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   padding: 20px 16px;
   display: flex;
   flex-direction: column;
@@ -54,6 +56,14 @@ body {
   margin: 8px 0 0;
 }
 
+.cover .kelas-meta {
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--muted);
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
 .cover nav {
   display: flex;
   flex-direction: column;
@@ -62,7 +72,7 @@ body {
 
 .cover nav button {
   text-align: left;
-  background: rgba(10, 25, 50, 0.5);
+  background: var(--panel-2);
   border: 1px solid var(--border);
   color: var(--muted);
   font-family: var(--mono);
@@ -78,7 +88,30 @@ body {
   background: var(--accent);
   color: var(--accent-text);
   border-color: var(--accent);
-  box-shadow: 0 0 10px var(--accent);
+  box-shadow: 0 0 10px var(--accent-soft);
+}
+
+.cover .theme-btn {
+  margin-top: auto;
+  width: 36px;
+  height: 36px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  transition: all 0.2s ease;
+}
+
+.cover .theme-btn:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 10px var(--accent-soft);
 }
 
 main.paper {
@@ -86,16 +119,97 @@ main.paper {
   min-width: 0;
 }
 
+.view-head h2 {
+  font-family: var(--mono);
+  font-size: 18px;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+}
+
+.view-head p {
+  margin: 0 0 16px;
+  color: var(--text);
+  font-size: 13px;
+  opacity: 0.9;
+}
+
 .card {
   background: var(--panel);
   border: 1px solid var(--border);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
   padding: 16px;
   margin-bottom: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
-/* Tabel Data Mahasiswa Sci-Fi */
+/* Form */
+.add-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.add-form .field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.add-form label {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.add-form input {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 7px 10px;
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+  outline: none;
+}
+
+.add-form .btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: var(--accent);
+  color: var(--accent-text);
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  transition: all 0.2s ease;
+}
+
+.add-form .btn:hover {
+  box-shadow: 0 0 10px var(--accent-soft);
+}
+
+.form-error {
+  color: var(--coral);
+  font-size: 12px;
+  font-family: var(--mono);
+  width: 100%;
+}
+
+/* Tabel Data Mahasiswa */
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 table.roster {
   width: 100%;
   border-collapse: collapse;
@@ -109,11 +223,12 @@ table.roster th {
   border-bottom: 1px solid var(--border);
   padding: 10px;
   text-align: left;
+  background: var(--panel-2);
 }
 
 table.roster td {
   padding: 10px;
-  border-bottom: 1px solid rgba(0, 210, 255, 0.1);
+  border-bottom: 1px solid var(--border);
   font-size: 13px;
 }
 
@@ -129,28 +244,61 @@ table.roster td.nilai {
   gap: 14px;
 }
 
+.race-col h3 {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--accent);
+  margin: 0 0 12px;
+}
+
 .slot-row {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
   border: 1px solid var(--border);
-  background: rgba(6, 16, 36, 0.8);
+  background: var(--panel-2);
   clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
   margin-bottom: 6px;
 }
 
 .slot-row[data-state="compare"] {
   border-color: var(--amber);
-  background: rgba(255, 170, 0, 0.15);
+  background: rgba(217, 119, 6, 0.15);
 }
 
 .slot-row[data-state="swap"] {
   border-color: var(--coral);
-  background: rgba(255, 0, 85, 0.15);
+  background: rgba(224, 82, 117, 0.15);
 }
 
 .slot-row[data-state="sorted"] {
   border-color: var(--sage);
-  background: rgba(0, 255, 170, 0.15);
+  background: rgba(16, 185, 129, 0.15);
+}
+
+@media (max-width: 800px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .cover {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cover nav {
+    flex-direction: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cover nav button {
+    white-space: nowrap;
+    flex: none;
+  }
+
+  .race-grid {
+    grid-template-columns: 1fr;
+  }
 }

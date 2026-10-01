@@ -206,14 +206,14 @@
   function play() {
     if (stepIndex >= steps.length - 1) stepIndex = 0;
     playing = true;
-    btnPlay.textContent = " Jeda";
+    btnPlay.textContent = "⏸ JEDA";
     clearTimeout(playTimer);
     playTimer = setTimeout(tick, Number(speedInput.value));
   }
 
   function pause() {
     playing = false;
-    btnPlay.textContent = " Putar";
+    btnPlay.textContent = "▶ PUTAR";
     clearTimeout(playTimer);
   }
 
@@ -355,7 +355,7 @@
   btnReset.addEventListener("click", () => { pause(); goTo(0); });
   btnShuffle.addEventListener("click", reshuffle);
 
-  /* ---------- Local Theme Toggle ---------- */
+  /* ---------- Local Theme Toggle & Sync ---------- */
   const themeToggle = document.getElementById("themeToggle");
   const THEME_KEY = "sorting-lab-theme";
 
@@ -371,11 +371,18 @@
   }
 
   function loadThemePref() {
-    try { return localStorage.getItem(THEME_KEY); } catch (e) { return null; }
+    try {
+      return localStorage.getItem(THEME_KEY) || localStorage.getItem("shell-theme");
+    } catch (e) {
+      return null;
+    }
   }
 
   function saveThemePref(theme) {
-    try { localStorage.setItem(THEME_KEY, theme); } catch (e) { }
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+      localStorage.setItem("shell-theme", theme);
+    } catch (e) { }
   }
 
   function applyTheme(theme) {
@@ -384,7 +391,10 @@
     } else {
       document.documentElement.removeAttribute("data-theme");
     }
-    if (themeToggle) themeToggle.textContent = isDarkActive() ? "☀️" : "🌙";
+    if (themeToggle) {
+      themeToggle.textContent = isDarkActive() ? "☀️" : "🌙";
+      themeToggle.title = isDarkActive() ? "Ganti ke Tema Light" : "Ganti ke Tema Dark";
+    }
   }
 
   if (themeToggle) {
@@ -392,8 +402,24 @@
       const next = isDarkActive() ? "light" : "dark";
       applyTheme(next);
       saveThemePref(next);
+      try {
+        window.parent.postMessage({ type: "THEME_CHANGE", theme: next }, "*");
+      } catch (e) { }
     });
   }
+
+  window.addEventListener("message", (e) => {
+    if (e.data && e.data.type === "THEME_CHANGE" && e.data.theme) {
+      applyTheme(e.data.theme);
+      saveThemePref(e.data.theme);
+    }
+  });
+
+  window.addEventListener("storage", (e) => {
+    if ((e.key === THEME_KEY || e.key === "shell-theme") && e.newValue) {
+      applyTheme(e.newValue);
+    }
+  });
 
   applyTheme(loadThemePref());
 
